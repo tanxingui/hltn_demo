@@ -1,6 +1,8 @@
 # 类装饰器
 import time
 
+def add():
+    pass
 
 class Decorator(object):
     def __init__(self, fuc):
