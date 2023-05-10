@@ -1,3 +1,8 @@
+#!/usr/bin/env python
+# -*- coding: utf-8 -*-
+# @Time    : 2023/05/10 20:54
+# @Author  : 新贵大人
+
 import json
 from datetime import datetime, timedelta
 import re
