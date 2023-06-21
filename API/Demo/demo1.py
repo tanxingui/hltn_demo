@@ -49,7 +49,6 @@
 #     main1(2, 3, huitiao)
 
 # 闭包
-import time
 
 
 # def logger(fac):
@@ -72,3 +71,38 @@ import time
 #
 #
 # abc(2, 3, 2, 4)
+
+
+
+
+
+
+# class B():
+#     g = 55
+#
+#     def run2(self):
+#         print(8888888888888888888888888888888)
+#
+# # 创建类A
+# class A():
+#     def __new__(cls, *args, **kwargs):
+#
+#         return object.__new__(B, *args, **kwargs)  # 传参传的其他类对象B，最后return返回B类对象实例，可调用B类的方法、属性
+#
+#     def __init__(self):
+#        self.a = 2
+#        self.b = 3
+#
+#     def run(self):
+#         print(222222222222222222222222)
+#
+# aaa = A()
+# bbb = A()
+#
+# print(aaa is bbb)
+#
+# print(bbb.g)
+# bbb.run2()
+
+
+
