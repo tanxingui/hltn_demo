@@ -52,7 +52,7 @@ def get_course_time():
                         "beginTime": item.get('beginTime')
                     }
                     time_str = result_dict['date'].strftime("%Y-%m-%d")
-                    return [course_id, f"{time_str}" + " " + f"{result_dict['beginTime']}"]
+                    return [[course_id], [f"{time_str}" + " " + f"{result_dict['beginTime']}"]]
 
 
 print(get_course_time())
