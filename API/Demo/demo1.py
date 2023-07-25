@@ -2,16 +2,18 @@ import re
 from datetime import datetime, timedelta
 import requests
 
+token = 'eyJhbGciOiJIUzI1NiJ9.eyJkYXRhIjoiekhhM2VFbGxsU2FlNTB3MVhqamgwQXBEVzllNDhxb0RVTCtHYXZxdWRrdTRGeXk0OEZBZVVNQWU2bFRSV1lBK0h2TGYrYWRrRTI2SURMTXVPK3RoSFZVNktZSWdvaFBUR0xaaUxBU1pkb3FLNFlzc3gwL3g2ZGdvQlFKZlhlNmFxODdMaUpPYzdTWHIwcDY2eXJ5WnFWMlNKb1dtUU8vV0pqWVFmUkVKOEhZZm4yS25wQnh6Vkx3Z3N4eDRMNS9kRFduNnNZdmJnQmNyTkx1T0RMeWQ2OHJYOXdDUDA4aWhmdkMyRXZlV28venQxZkRreHh3NWM5Rkp3d3lhSExycmtJak5KMVRWS0hybkZ3bC9tQ1VXMlE9PSIsImV4cCI6MTcwNTgzMTUzM30.c5x_IA3_NE518C-7jf-dQc2X6OXSzXFKlNZLV9s0w54'
+
 
 def get_demo_course():
     url = "https://gw-mg-test.61info.cn/hll-leads-manager-provider/o/experience/student/specialCourse"
     payload = {
-        "studentId": 22624518,
+        "studentId": 22625430,
         "language": 1
     }
-    header = {
-        "authorization": "eyJhbGciOiJIUzI1NiJ9.eyJkYXRhIjoiSUNwa01oNTYxMDVmck92TE1yUmJRamFkdFJjSTBscWUxYytZZCt3SEJuK3FRcnRoWHh0ZTdMZm40cFpUMFpCNW1ZSmxEeGxaWWVZZVhMSkMzcmIzcENGQ0ZiRmhIM1JOR0VjR1RiOFl1SGVtNWhvOVhFZWkzY2FyTjlpNUtnSmpGUGJvWTZmZHpUYTFQWmE4UktudFoxdEpjM2J3TnVCN0loUFFwTUxRMmphb1I2MnIxQnZEMXM2TVpTYTB6eVZNYldUTnJJWTdSMlE5NTI0NFFHdmc0UFRRcFcyOVB3ejlqYXNVeHQ3clRLU3AxcHFZM1NId0ZUSXJyRWxrTUFCTDBjY3RTUmVKZ1cwZ2hYbFluWmI2OWc9PSIsImV4cCI6MTcwNTM4Njc3MX0.SbkukqZBUsJxwgVU0QxDgvGwvWZs1LK8XUvfIttKmlU"
-    }
+    header = {"authorization":
+                  token
+              }
     response = requests.post(url=url, data=payload, headers=header)
     course_ids = re.findall(r"'id': (\d+)", str(response.json()))
     course_names = re.findall(r"'name': (.+?),", str(response.json()))
@@ -28,6 +30,7 @@ def future_date(num_day):
         dates_list.append(future_date)
     return dates_list
 
+
 # 获取有学位的课程id以及时间
 def get_course_time():
     demo_courses = get_demo_course()
@@ -42,7 +45,7 @@ def get_course_time():
                 "studentId": 22624527,
             }
             header = {
-                "authorization": "eyJhbGciOiJIUzI1NiJ9.eyJkYXRhIjoiSUNwa01oNTYxMDVmck92TE1yUmJRamFkdFJjSTBscWUxYytZZCt3SEJuK3FRcnRoWHh0ZTdMZm40cFpUMFpCNW1ZSmxEeGxaWWVZZVhMSkMzcmIzcENGQ0ZiRmhIM1JOR0VjR1RiOFl1SGVtNWhvOVhFZWkzY2FyTjlpNUtnSmpGUGJvWTZmZHpUYTFQWmE4UktudFoxdEpjM2J3TnVCN0loUFFwTUxRMmphb1I2MnIxQnZEMXM2TVpTYTB6eVZNYldUTnJJWTdSMlE5NTI0NFFHdmc0UFRRcFcyOVB3ejlqYXNVeHQ3clRLU3AxcHFZM1NId0ZUSXJyRWxrTUFCTDBjY3RTUmVKZ1cwZ2hYbFluWmI2OWc9PSIsImV4cCI6MTcwNTM4Njc3MX0.SbkukqZBUsJxwgVU0QxDgvGwvWZs1LK8XUvfIttKmlU"
+                "authorization": token
             }
             response = (requests.post(url=url, data=payload, headers=header)).json()['data']
             for item in response:
@@ -52,7 +55,10 @@ def get_course_time():
                         "beginTime": item.get('beginTime')
                     }
                     time_str = result_dict['date'].strftime("%Y-%m-%d")
-                    return [[course_id], [f"{time_str}" + " " + f"{result_dict['beginTime']}"]]
+                    # return f"{time_str}" + " " + f"{result_dict['beginTime']}"
+                    # 返回datetime类型的对象，否则接口不支持
+                    return datetime.strptime(f"{time_str}" + " " + f"{result_dict['beginTime']}",
+                                                      "%Y-%m-%d %H:%M")
 
 
 print(get_course_time())
