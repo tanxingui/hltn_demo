@@ -1,17 +1,14 @@
-# class MyRange(object):
-#     def __init__(self, start, stop):
-#         self.start = start
-#         self.stop = stop
-#
-#     def __iter__(self):  # __iter__方法必须放回self
-#         return self
-#
-#     def __next__(self):  # __next__方法必须返回下一个值，当我们所有的元素都迭代完毕后，再执行next方法时就会出现StopIteration异常。
-#         if self.start >= self.stop - 1:
-#             raise StopIteration
-#         self.start += 1
-#         return self.start
-#
-#
-# for i in MyRange(0, 3):  # for语句的迭代，会忽略StopIteration异常
-#     print(i)  # 输出：0 1 2
+import hashlib
+import base64
+
+
+def md5_parm(msg, md5):
+    data = msg + md5
+    data_digest = hashlib.md5(data.encode(encoding='utf-8')).hexdigest()
+    return base64.b64encode(data_digest.encode(encoding='utf-8')).decode()
+
+
+if __name__ == '__main__':
+    msg_body = '{"traces":[{"opOrgCode":"51800101","opTime":"2017-12-14 19:57:14","opName":"投递结果反馈-妥投","traceNo":"9620140653354","opDesc":"已签收,本人签收 :++,投递员:方焕钦18682231315","operatorNo":"445224198407150938","opCode":"704","opOrgName":"中国邮政集团公司深圳市建设路支局","opOrgProvName":"广东","operatorName":"方焕钦","opOrgCity":"深圳"}]}'
+    md5 = "7D9D221E7FAC1FC653FA8B8B90A9C5E5"
+    print(md5_parm(msg_body, md5))

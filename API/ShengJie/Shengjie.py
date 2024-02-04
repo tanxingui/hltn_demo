@@ -1,7 +1,7 @@
 import jsonpath
 import pandas as pd
 import requests
-from SelectApi import DBConnection
+from ShengJie.Mysqlconfig import DBConnection
 import json
 import time
 
@@ -12,9 +12,9 @@ user_id_iii = [259097, 216412, 22460660, 22460654, 9999127, 9999269, 9999280, 99
 9999269,
 9999280,
 9999608'''
-user_Id = []
+
 # 鉴权
-authorization = 'eyJhbGciOiJIUzI1NiJ9.eyJkYXRhIjoiSUNwa01oNTYxMDVmck92TE1yUmJRamFkdFJjSTBscWUxYytZZCt3SEJuL0Rxem9LTnNiYUhHTHo0V1pwTGU0S3orc1phdU9SdnhzN3VCbDVHRXZMeVZGN1d5cTNpYlVTdVllY1NVMDlod0RNVmtGSjdHeWJZY010aFc4VWpwM3U0YzZrUCtWekduYnlwNDg4SXJnQUxuSkw2SDNwcXNVZ0ZDNFRXYitOS2tvU1JMbVlvV0Q2YWx0amxiSHRPWWlLajB3cUdOSzhMeDR3ZnJ2c09Gc0hmT0pSaUQwOUJMa1Yra1RVM2VLTyt3WHB6MldUUjZOQUt1bmpZZVpLa1BmMU1BcHcrR0ZSVEs4WFR4eVR3cS9HckE9PSIsImV4cCI6MTY5MzI5OTA5N30.83o1-XoS8lGsmtcDbmUnsrOl4fq1FswZWNdUUAeFp5Y'
+authorization = 'eyJhbGciOiJIUzI1NiJ9.eyJkYXRhIjoiSUNwa01oNTYxMDVmck92TE1yUmJRamFkdFJjSTBscWUxYytZZCt3SEJuL3RsblRUYWpIamhEdE0zWDBhSkhBTW1ZSmxEeGxaWWVZZVhMSkMzcmIzcFBCWU0yaVJBbGlHZnBnaE9UV1pNcXYwSlRZYXNvSEFaai9VUnFrd0s1aWUxcERBZlVwUzJYdDFaQXQ5M1RmRHBVYlBXVUE4YW1mMnRWMnVUTThlSVE4VnpLLy9aZFh1TVF5OTB0aytzSnMwMGlxc0pOMmVla3l1MjkwQlhWVTY5Uy9FajZtYi94eGNZT1dxZ2NwbkxsQ0ZUWnZ4YzBWaTc4bW1mOG9HVkk0cE9tamxTRFJNb01rNUoxWkw0WmgzUGc9PSIsImV4cCI6MTcxMjQ4MzcwMH0.p6pfh7YvMqrI8OxE0BrUk7wsap4haKKJ0s9YYn8QJm8'
 
 
 # 查询学员是周几上课的,获取周期中最多学员上课的一日
@@ -46,25 +46,28 @@ def week():
         raise '鉴权码要换个新的'
 
 
-# 提交升阶分班
+# 根据原班级的上课时间提交升阶分班意向
 def apply():
-    for i in user_Id:
-        url1 = 'https://gw-mg-test.61info.cn/manager-api/o/advanced/allocation/application/getCurrentClassInfo?userId=%s' % i
-        headers = {
-            'content-type': 'application/json',
-            'authorization': authorization
-        }
-        res1 = requests.get(url=url1, headers=headers)
-        weeK = jsonpath.jsonpath(res1.json(), '$..week')[0]  # 获取星期几
-        courseTimeId = jsonpath.jsonpath(res1.json(), '$..courseTimeId')[0]  # 获取时间段对应的id
-        url2 = 'https://gw-mg-test.61info.cn/manager-api/o/advanced/allocation/application/apply'
-        payload = json.dumps({
-            "weekDay": weeK,
-            "courseTimeScheduleId": courseTimeId,
-            "userId": i
-        })
-        res2 = requests.post(url=url2, data=payload, headers=headers)
-        print(res2.json())
+    try:
+        for i in user_Id:
+            url1 = 'https://gw-mg-test.61info.cn/manager-api/o/advanced/allocation/application/getCurrentClassInfo?userId=%s' % i
+            headers = {
+                'content-type': 'application/json',
+                'authorization': authorization
+            }
+            res1 = requests.get(url=url1, headers=headers)
+            weeK = jsonpath.jsonpath(res1.json(), '$..week')[0]  # 获取原班级是星期几上课
+            courseTimeId = jsonpath.jsonpath(res1.json(), '$..courseTimeId')[0]  # 获取原班级时间段对应的id
+            url2 = 'https://gw-mg-test.61info.cn/manager-api/o/advanced/allocation/application/apply'
+            payload = json.dumps({
+                "weekDay": weeK,
+                "courseTimeScheduleId": courseTimeId,
+                "userId": i
+            })
+            rsp = requests.post(url=url2, data=payload, headers=headers)
+            print(rsp.json())
+    except TypeError:
+        print("换个token")
 
 
 # 查询所在班级id
@@ -80,10 +83,10 @@ def groupId():
     return group_id
 
 
-# 修改成相同的授课老师 teacher_id = 100077   100060   100057   100066  200009
-def updateteacher():
+# 修改成相同的授课老师 teacher_id = 100077   100060   100057   100066  200009   400474
+def updateteacher(AAA):
     for i in groupId():
-        DBConnection().update("UPDATE group_teach_relation set teacher_id = 100057 where group_id = %s" % i)
+        DBConnection().update("UPDATE group_teach_relation set teacher_id = %s where group_id = %s" % (AAA, i))
 
 
 # 修改年龄
@@ -115,18 +118,18 @@ def kehao():
 # 修改扩班意向为八人班
 def group_size():
     for i in user_Id:
-        DBConnection().update("update allocation_application_advance set group_size = 8 where user_id = %s" % i)
+        DBConnection().update("update allocation_application_advance set group_size = 6 where user_id = %s" % i)
 
 
 # 修改意向课程等级 L1=1  L2=5  L3=9  L4=13  L5=17  L6=21 5：高阶-经典艺术 6：高阶-设计艺术   页面上改
-def level():
+def level(dengji):
     for i in user_Id:
         DBConnection().update(
-            "update allocation_application_advance set begin_course_stage_id = 5 where user_id = %s" % i)
+            "update allocation_application_advance set begin_course_stage_id = %s where user_id = %s" % (dengji, i))
 
 
 # 修改意向班级、意向时段   意向班级：28普通班，30中英班，31咕比班，29粤语班
-def Class():
+def Class(yixiangbanji,week):
     cursor = DBConnection().getCon().cursor()  # 创建游标对象
     # 调接口获取页面上展示的时间段
     url = 'https://gw-mg-test.61info.cn/manager-api/o/advanced/allocation/application/getAdvancedAllocateDateTimeList?userId=22560489&intentGroup=0'
@@ -149,10 +152,11 @@ def Class():
     input_id = input("输入你要的时间段id：")
     for i in user_Id:  # 修改升阶分班班级的时间、意向班级，时段前端页面不会改变
         DBConnection().update(
-            "update allocation_application_advance set intent_group = 28 , course_time_schedule_id = %s where user_id = %s" % (
-                input_id, i))
+            "update allocation_application_advance set intent_group = %s , course_time_schedule_id = %s where user_id = %s" % (
+                yixiangbanji, input_id, i))
     for i in groupId():  # 修改原班级的时间
         DBConnection().update("update group_info set course_time_id = %s where id = %s" % (input_id, i))
+        DBConnection().update("update group_week_time_relation set time = %s,week = %s where group_id = %s" % (input_id, week, i))
     cursor.close()
 
 
@@ -186,16 +190,21 @@ def cancelApply():
 if __name__ == '__main__':
     bengin_time = time.time()
     print('开始修改')
-    week()  # 查询学员是周几上课的,获取周期中最多学员上课的一日
-    # apply()  # 提交升阶分班
+    user_Id = [22620912,22621788,22621831]
+    # week()  # 查询学员是周几上课的,获取周期中最多学员上课的一日
+    apply()  # 提交升阶分班
     # groupId()  # 查询所在班级id
-    # updateteacher()  # 修改成相同的授课老师 teacher_id = 100077   100060   100057   100066
-    # # age()  # 修改年龄
-    # # kehao()   # 修改课耗
+    updateteacher(400474)  # 修改成相同的授课老师 teacher_id = 100077   100060   100057   100066   100029  201922  100061
+    # age()  # 修改年龄
+    # kehao()   # 修改课耗
     # group_size()  # 修改扩班意向为八人班
-    # level()  # 修改意向课程等级 L1=1  L2=5  L3=9  L4=13  L5=17  L6=21 5：高阶-经典艺术 6：高阶-设计艺术
-    # Class()  # 修改意向班级、意向时段   意向班级：28普通班，30中英班，31咕比班，29粤语班
+    level(9)  # 修改意向课程等级 L1=1  L2=5  L3=9  L4=13   高阶-经典艺术=17  高阶-设计艺术=21
+    Class(28,2)  # 修改意向班级、意向时段   意向班级：28普通班，30中英班，31咕比班，29粤语班   后面这个参数是周几
     # cancelApply()  # 撤销升阶已选择
     print('修改完毕')
     end_time = time.time()
     print('本次耗时：', '%.2f' % (end_time - bengin_time), "秒", sep='')
+
+
+
+
