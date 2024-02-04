@@ -112,6 +112,13 @@ def get_date_and_next_days(num):
     next_days_str = next_days.strftime('%Y-%m-%d')
     return [current_date_str, next_days_str]
 
+def today_date():
+    today = datetime.now().date()
+    return today
+
+def future_num_date(num_day):
+    future_date = today_date() + timedelta(days=num_day)
+    return future_date
+
 if __name__ == '__main__':
-    print(type(get_date_and_next_days(20)))
-    print(get_date_and_next_days(30))
+    print(future_num_date(10))

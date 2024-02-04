@@ -2,7 +2,7 @@ import pymysql
 
 
 class DBConnection:
-    def __init__(self, ip='testdb.61info.com', port=3306, user='root', passwd='dbtest', db="i61-hll-manage"):
+    def __init__(self, ip='testdb.61info.com', port=3306, user='root', passwd='dbtest', db="i61-hll-manager"):
         self.ip = ip
         self.port = port
         self.user = user
