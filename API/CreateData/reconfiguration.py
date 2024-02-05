@@ -299,7 +299,7 @@ class OperationTable:
                            domain='.cos.accelerate.myqcloud.com'):
         # 修改要上传表格的数据
         self.operation_table()
-        front_sign_data = self.get_front_sign()
+        front_sign_data = OperationTable().get_front_sign()
         if front_sign_data and isinstance(front_sign_data['ossToken'], str):
             try:
                 dic = json.loads(front_sign_data['ossToken'])
@@ -351,8 +351,8 @@ class KCBusinessProcessAPI:
 
     # 口才导入订单
     def import_order(self):
-        self.update_file_to_cos()
-        front_sign_data = self.get_front_sign()
+        OperationTable().update_file_to_cos()
+        front_sign_data = OperationTable().get_front_sign()
         if front_sign_data:
             url2 = f'https://{InputMethods().input_environment}-attch-api.vipthink.cn/v1/attach/notify'
             url3 = f'https://{InputMethods().input_environment}-gw.vipthink.cn/api/trade_order/v1/admin/orderImport/urlImport'
