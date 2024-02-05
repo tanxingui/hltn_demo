@@ -5,13 +5,6 @@
 # @Author : 新贵大人
 描述:
 """
-# !/usr/bin/env python
-# -*- coding: utf-8 -*-
-"""
-# @Time   : 2024/01/27 09:45
-# @Author : 新贵大人
-描述:
-"""
 import base64
 import json
 import os
@@ -29,6 +22,7 @@ class PushStudentOrder:
         '''
         :param environment: 环境uat or preprod
         :param num: 需要上传的学员订单条数
+        :param custom_number: 自定义的手机号
         '''
         self.subject = self.subject()
         self.environment = self.input_environment()
@@ -202,7 +196,7 @@ class PushStudentOrder:
                     sheet.cell(row=3 + index, column=2, value='0')  # 收款渠道
                     sheet.cell(row=3 + index, column=4, value="86")  # 手机区号
                     sheet.cell(row=3 + index, column=8, value='31825515')  # 套餐skuid
-                    sheet.cell(row=3 + index, column=9, value='0')  # 订单支付金额
+                    sheet.cell(row=3 + index, column=9, value='0.02')  # 订单支付金额
                     sheet.cell(row=3 + index, column=10, value=formatted_datetime1)  # 支付时间
                     sheet.cell(row=3 + index, column=11, value="free")  # 支付方式
                     sheet.cell(row=3 + index, column=12, value="0")  # 渠道id

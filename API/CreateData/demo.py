@@ -5,13 +5,6 @@
 # @Author : 新贵大人
 描述:
 """
-# !/usr/bin/env python
-# -*- coding: utf-8 -*-
-"""
-# @Time   : 2024/01/27 09:45
-# @Author : 新贵大人
-描述:
-"""
 import base64
 import json
 import os
@@ -29,6 +22,7 @@ class PushStudentOrder:
         '''
         :param environment: 环境uat or preprod
         :param num: 需要上传的学员订单条数
+        :param custom_number: 自定义的手机号
         '''
         self.subject = self.subject()
         self.environment = self.input_environment()
