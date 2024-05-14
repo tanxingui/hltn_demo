@@ -26,8 +26,9 @@ class PushStudentOrder:
         '''
         self.subject = self.subject()
         self.environment = self.input_environment()
-        self.num = self.input_num()
         self.custom_number = self.custom_phone_number()
+        if self.custom_number == "0":
+            self.num = self.input_num()
         self.token = self.get_crm_login_token()
         self.front_sign_data = None
         self.cached_phone_list = None
@@ -40,7 +41,7 @@ class PushStudentOrder:
 
     def subject(self):
         while True:
-            subject = input("请输入：(1)-->口才    (2)-->益智")
+            subject = input("请输入：(1)-->口才    (2)-->益智    (3)-->魔力")
             try:
                 subject = int(subject)
             except ValueError:
@@ -50,6 +51,8 @@ class PushStudentOrder:
                 return "口才"
             elif subject == 2:
                 return "益智"
+            elif subject == 3:
+                return "魔力"
             else:
                 print("请输入一个数字(1)/(2)获取正确的学科")
                 continue
@@ -60,6 +63,8 @@ class PushStudentOrder:
             try:
                 if custom_number == "0":
                     return custom_number
+                elif custom_number == "":
+                    return str(0)
                 else:
                     # 将中英文逗号都替换为普通逗号
                     custom_number = custom_number.replace('，', ',').replace('、', ',').replace('.', ',').replace('。',
@@ -111,11 +116,17 @@ class PushStudentOrder:
 
     def handle_api_response(self, response):
         try:
-            resp_json = response.json()
+            # 检查HTTP响应是否成功
             response.raise_for_status()
-            return resp_json
-        except requests.exceptions.RequestException as e:
-            return {"error": f"API请求错误: {e}"}
+            # 尝试解析响应
+            resp_json = response.json()
+            if resp_json['code'] == 0 or resp_json['code'] == 200 or resp_json['success'] == "true":
+                return resp_json
+            else:
+                return {"error": f"API响应错误: {resp_json['msg']}"}
+        except (requests.exceptions.RequestException, json.decoder.JSONDecodeError, KeyError) as e:
+            # 返回一个包含错误信息的字典
+            return {"error": f"操作失败！请求错误: {e}"}
 
     def get_path(self, file_name):
         file_local_path_name = os.path.join(os.path.dirname(os.path.realpath(__file__)), f"{file_name}.xlsx")
@@ -182,21 +193,38 @@ class PushStudentOrder:
         data_list = self.get_student_phone()
         formatted_datetime1 = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
         formatted_datetime2 = datetime.now().strftime("%Y%m%d%H%M%S")
-        if self.subject == "口才":
-            file_path = self.get_path('test')
-            workbook = openpyxl.load_workbook(file_path)
-            sheet = workbook["Sheet1"]
-            # 清空表格的数据
-            if sheet.max_row > 2:
-                # 行号是从1开始计数的，而不是从0开始，所以这里是3，
-                for row in range(3, sheet.max_row + 1):
-                    sheet.delete_rows(row)
-            if self.environment == "uat":
+        environment_settings = {
+            "uat": {
+                "kc_package_skuId": '31825515',
+                "kc_order_amount": '0.02',
+                "mmears_package_skuId": '31830439',
+                "mmears_order_amount": '0.03',
+                "yz_package_skuId": '10025804',
+                "yz_order_amount": '2.3'
+            },
+            "preprod": {
+                "kc_package_skuId": '20528464',
+                "kc_order_amount": '0.01',
+                "yz_package_skuId": '10016610',
+                "yz_order_amount": '0.01'
+            }
+        }
+        if self.subject == "口才" or self.subject == "魔力":
+            if self.environment in environment_settings:
+                settings = environment_settings[self.environment]
+                file_path = self.get_path('biaoda')
+                workbook = openpyxl.load_workbook(file_path)
+                sheet = workbook["Sheet1"]
+
+                # 清空表格的数据
+                if sheet.max_row > 2:
+                    # 行号是从1开始计数的，而不是从0开始，所以这里是3，
+                    for row in range(3, sheet.max_row + 1):
+                        sheet.delete_rows(row)
+
                 for index, value in enumerate(data_list):
                     sheet.cell(row=3 + index, column=2, value='0')  # 收款渠道
                     sheet.cell(row=3 + index, column=4, value="86")  # 手机区号
-                    sheet.cell(row=3 + index, column=8, value='31825515')  # 套餐skuid
-                    sheet.cell(row=3 + index, column=9, value='0.02')  # 订单支付金额
                     sheet.cell(row=3 + index, column=10, value=formatted_datetime1)  # 支付时间
                     sheet.cell(row=3 + index, column=11, value="free")  # 支付方式
                     sheet.cell(row=3 + index, column=12, value="0")  # 渠道id
@@ -204,38 +232,34 @@ class PushStudentOrder:
                     sheet.cell(row=3 + index, column=15, value="0")  # 是否需要地址
                     sheet.cell(row=3 + index, column=1, value=f'XG{formatted_datetime2}{value}')  # 第三方订单号
                     sheet.cell(row=3 + index, column=5, value=value)  # 手机号
-            elif self.environment == "preprod":
-                for index, value in enumerate(data_list):
-                    sheet.cell(row=3 + index, column=2, value='0')  # 收款渠道
-                    sheet.cell(row=3 + index, column=4, value="86")  # 手机区号
-                    sheet.cell(row=3 + index, column=8, value='20528464')  # 套餐skuid
-                    sheet.cell(row=3 + index, column=9, value='0.01')  # 订单支付金额
-                    sheet.cell(row=3 + index, column=10, value=formatted_datetime1)  # 支付时间
-                    sheet.cell(row=3 + index, column=11, value="free")  # 支付方式
-                    sheet.cell(row=3 + index, column=12, value="0")  # 渠道id
-                    sheet.cell(row=3 + index, column=13, value="1999")  # 获得原因
-                    sheet.cell(row=3 + index, column=15, value="0")  # 是否需要地址
-                    sheet.cell(row=3 + index, column=1, value=f'XG{formatted_datetime2}{value}')  # 第三方订单号
-                    sheet.cell(row=3 + index, column=5, value=value)  # 手机号
-            workbook.save(file_path)
-            workbook.close()
+                    if self.subject == "口才":
+                        sheet.cell(row=3 + index, column=8, value=settings["kc_package_skuId"])  # 套餐skuid
+                        sheet.cell(row=3 + index, column=9, value=settings["kc_order_amount"])  # 订单支付金额
+                    elif self.subject == "魔力":
+                        sheet.cell(row=3 + index, column=8, value=settings["mmears_package_skuId"])  # 套餐skuid
+                        sheet.cell(row=3 + index, column=9, value=settings["mmears_order_amount"])  # 订单支付金额
+                workbook.save(file_path)
+                workbook.close()
         elif self.subject == "益智":
-            file_path = self.get_path('yizhi')
-            workbook = openpyxl.load_workbook(file_path)
-            sheet = workbook["导入主表"]
-            # 清空表格的数据
-            if sheet.max_row > 2:
-                # 行号是从1开始计数的，而不是从0开始，所以这里是3，
-                for row in range(3, sheet.max_row + 1):
-                    sheet.delete_rows(row)
-            if self.environment == "uat":
+            if self.environment in environment_settings:
+                settings = environment_settings[self.environment]
+                file_path = self.get_path('yizhi')
+                workbook = openpyxl.load_workbook(file_path)
+                sheet = workbook["导入主表"]
+
+                # 清空表格的数据
+                if sheet.max_row > 2:
+                    # 行号是从1开始计数的，而不是从0开始，所以这里是3，
+                    for row in range(3, sheet.max_row + 1):
+                        sheet.delete_rows(row)
+
                 for index, value in enumerate(data_list):
                     sheet.cell(row=3 + index, column=2, value='新贵测试')  # 用户姓名
                     sheet.cell(row=3 + index, column=3, value="86")  # 手机区号
                     sheet.cell(row=3 + index, column=5, value='')  # 学员id
-                    sheet.cell(row=3 + index, column=6, value='468078')  # 渠道id
-                    sheet.cell(row=3 + index, column=7, value='10025667')  # 套餐id
-                    sheet.cell(row=3 + index, column=8, value="0.03")  # 订单支付金额
+                    sheet.cell(row=3 + index, column=6, value=settings["yz_package_skuId"])  # 渠道id
+                    sheet.cell(row=3 + index, column=7, value=settings["yz_package_skuId"])  # 套餐id
+                    sheet.cell(row=3 + index, column=8, value="2.3")  # 订单支付金额
                     sheet.cell(row=3 + index, column=9, value=formatted_datetime1)  # 支付时间
                     sheet.cell(row=3 + index, column=10, value="第三方售卖")  # 支付方式
                     sheet.cell(row=3 + index, column=11, value="0")  # 收款渠道id
@@ -244,24 +268,8 @@ class PushStudentOrder:
                     sheet.cell(row=3 + index, column=15, value="0")  # 是否需要地址
                     sheet.cell(row=3 + index, column=1, value=f'XG{formatted_datetime2}{value}')  # 外部订单号
                     sheet.cell(row=3 + index, column=4, value=value)  # 手机号
-            elif self.environment == "preprod":
-                for index, value in enumerate(data_list):
-                    sheet.cell(row=3 + index, column=2, value='新贵测试')  # 用户姓名
-                    sheet.cell(row=3 + index, column=3, value="86")  # 手机区号
-                    sheet.cell(row=3 + index, column=5, value='')  # 学员id
-                    sheet.cell(row=3 + index, column=6, value='470640')  # 渠道id
-                    sheet.cell(row=3 + index, column=7, value='10016610')  # 套餐id
-                    sheet.cell(row=3 + index, column=8, value="0.01")  # 订单支付金额
-                    sheet.cell(row=3 + index, column=9, value=formatted_datetime1)  # 支付时间
-                    sheet.cell(row=3 + index, column=10, value="第三方售卖")  # 支付方式
-                    sheet.cell(row=3 + index, column=11, value="0")  # 收款渠道id
-                    sheet.cell(row=3 + index, column=12, value="1999")  # 获得原因
-                    sheet.cell(row=3 + index, column=13, value="")  # 父订单号
-                    sheet.cell(row=3 + index, column=15, value="0")  # 是否需要地址
-                    sheet.cell(row=3 + index, column=1, value=f'XG{formatted_datetime2}{value}')  # 外部订单号
-                    sheet.cell(row=3 + index, column=4, value=value)  # 手机号
-            workbook.save(file_path)
-            workbook.close()
+                workbook.save(file_path)
+                workbook.close()
 
     # 获取导入订单需要的数据
     def get_front_sign(self):
@@ -270,15 +278,15 @@ class PushStudentOrder:
 
         url = f'https://{self.environment}-attch-api.vipthink.cn/v1/attach/getSign'
         data = {
-            "name": "test.xlsx",
+            "name": "biaoda.xlsx",
             "dir": "uploads/images",
             "mime": "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
             "ext": "xlsx",
-            "size": 16323,
+            "size": 16243,
             "driver": "tencent_oss",
             "code": "platform-trade"
         }
-        resp = self.handle_api_response(requests.post(url, json=data, headers={"authorization": self.token}))
+        resp = requests.post(url, json=data, headers={"authorization": self.token}).json()
         if resp and 'data' in resp:
             # 如果 'data' 不存在，设置为空字典
             data_dict = resp.get('data', {})
@@ -301,7 +309,7 @@ class PushStudentOrder:
             self.handle_api_response(requests.post(url2, json=data2, headers={"authorization": self.token}))
             data3 = {
                 "fileUrl": f"{front_sign_data['ossDomain']}{front_sign_data['path']}",
-                "fileName": "test.xlsx",
+                "fileName": "biaoda.xlsx",
                 "operatorId": 667508,
                 "operatorName": "谭新贵",
                 "importType": 1
@@ -327,11 +335,10 @@ class PushStudentOrder:
                 secret_id = dic['credentials']['tmpSecretId']
                 secret_key = dic['credentials']['tmpSecretKey']
                 token = dic['credentials']['sessionToken']
-
                 config = CosConfig(Region=region, SecretId=secret_id, SecretKey=secret_key, Token=token,
                                    Domain=Bucket + domain)
                 client = CosS3Client(config)
-                with open(self.get_path('test'), 'rb') as fp:
+                with open(self.get_path('biaoda'), 'rb') as fp:
                     response = client.put_object(
                         Bucket='test-1253622427',
                         Body=fp,
@@ -348,7 +355,7 @@ class PushStudentOrder:
     @property
     def get_batch(self):
         url = f'https://{self.environment}-gw.vipthink.cn/api/trade_order/v1/admin/orderImport/importRecord/list'
-        data = {"pageNo": 1, "pageSize": 20}
+        data = {"pageNo": 1, "pageSize": 100}
         resp = self.handle_api_response(requests.post(url, json=data, headers={"authorization": self.token}))
         data = resp.get('data', {})[0]
         # 将 createTime 字符串转换为 datetime 对象
@@ -356,13 +363,13 @@ class PushStudentOrder:
         current_time = datetime.now()
         one_minute = timedelta(minutes=20)
         # 获取两分钟内创建的第一个新订单
-        if current_time - create_time < one_minute and data.get('fileName', '') == "test.xlsx":
+        if current_time - create_time < one_minute and data.get('fileName', '') == "biaoda.xlsx":
             return data.get('batchNum', '')
 
     # 获取需要审批的record_dtl_id
     def get_order_recordDtlId(self) -> list:
         url = f'https://{self.environment}-gw.vipthink.cn/api/trade_order/v1/admin/orderImport/importRecord/dtlList'
-        data = {"pageNo": 1, "pageSize": 20, "batchNum": f"{self.get_batch}", "status": "WAIT_APPROVAL"}
+        data = {"pageNo": 1, "pageSize": 100, "batchNum": f"{self.get_batch}", "status": "WAIT_APPROVAL"}
         resp = self.handle_api_response(requests.post(url, json=data, headers={"authorization": self.token}))
         data = resp.get('data', {})
         # 提取所有recordDtlId
@@ -409,7 +416,7 @@ class PushStudentOrder:
     def yizhi_order_id(self) -> list:
         self.yizhi_next_step()
         url = f"https://{self.environment}-order.vipthink.cn/order/v1/order/importDetailList"
-        data = {"status": 1, "page": 1, "limit": 20, "importNum": f"{self.importNum}"}
+        data = {"status": 1, "page": 1, "limit": 100, "importNum": f"{self.importNum}"}
         resp = self.handle_api_response(requests.post(url, json=data, headers={"authorization": self.token}))
         if resp['code'] == 0:
             id_list = [i['id'] for i in resp['data']['data']]
@@ -442,7 +449,7 @@ class PushStudentOrder:
 
     # 最后执行的总函数
     def main(self):
-        if self.subject == "口才":
+        if self.subject == "口才" or self.subject == "魔力":
             try:
                 self.import_order()
                 self.last_auditing_order()
