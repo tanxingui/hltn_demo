@@ -1,14 +1,22 @@
-import hashlib
-import base64
+# -*- coding: utf-8 -*-
+"""第一个程序"""
+
+from PyQt5 import QtWidgets  # 导入PyQt5部件
+
+import sys
+
+app = QtWidgets.QApplication(sys.argv)  # 建立application对象
+
+first_window = QtWidgets.QWidget()  # 建立窗体对象
+
+first_window.resize(400, 300)  # 设置窗体大小
+
+first_window.setWindowTitle("我的第一个pyqt程序")  # 设置窗体标题
+
+first_window.show()  # 显示窗体
+
+sys.exit(app.exec())  # 运行程序
 
 
-def md5_parm(msg, md5):
-    data = msg + md5
-    data_digest = hashlib.md5(data.encode(encoding='utf-8')).hexdigest()
-    return base64.b64encode(data_digest.encode(encoding='utf-8')).decode()
 
 
-if __name__ == '__main__':
-    msg_body = '{"traces":[{"opOrgCode":"51800101","opTime":"2017-12-14 19:57:14","opName":"投递结果反馈-妥投","traceNo":"9620140653354","opDesc":"已签收,本人签收 :++,投递员:方焕钦18682231315","operatorNo":"445224198407150938","opCode":"704","opOrgName":"中国邮政集团公司深圳市建设路支局","opOrgProvName":"广东","operatorName":"方焕钦","opOrgCity":"深圳"}]}'
-    md5 = "7D9D221E7FAC1FC653FA8B8B90A9C5E5"
-    print(md5_parm(msg_body, md5))

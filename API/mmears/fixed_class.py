@@ -80,7 +80,7 @@ def get_teacher_id(token):
     response1 = requests.post(query_url, headers=header, json=payload1)
     if response1.status_code == 200:
         teacher_id = response1.json()['data']['records'][0]['teacherId']
-    payload2 = {"pageIndex": 1, "pageSize": 50, "teacherId": 219306}
+    payload2 = {"pageIndex": 1, "pageSize": 50, "teacherId": teacher_id}
     response2 = requests.post(class_url, headers=header, json=payload2)
     if response2.json()['data']['records']:
         mysql_conn = pymysql.connect(host='172.23.59.64', port=3306, user='mmtest', password='Mmears2023',
@@ -99,6 +99,6 @@ def get_teacher_id(token):
     return teacher_id
 
 
-# print(get_teacher_id(
-#     "eyJhbGciOiJIUzUxMiJ9.eyJzdWIiOiIxMzI1NiIsIm5hbWUiOiLosK3mlrDotLUiLCJzdXBwb3J0SWQiOm51bGwsImV4cCI6MTcwMjM0ODg1NywiaWF0IjoxNzAyMjYyNDU3LCJlbWFpbCI6InRhbnhpbmd1aUBobHRuLmNvbSJ9.mLvXLcZ3DNN6cyb19k61JgJfMZa0bfKbiYGJyVjWlaVy7JxwZhAmJhAQM_nQv4oXlFoJ3XQgGde9vQjsFI_Unw"))
-
+if __name__ == '__main__':
+    print(get_teacher_id(
+"eyJhbGciOiJIUzUxMiJ9.eyJzdWIiOiIxMzI1NiIsIm5hbWUiOiLosK3mlrDotLUiLCJzdXBwb3J0SWQiOm51bGwsImV4cCI6MTcwODY4NTU5MCwiaWF0IjoxNzA4NTk5MTkwLCJlbWFpbCI6InRhbnhpbmd1aUBobHRuLmNvbSJ9.eiMzV0RcdjvrMoVnVhQokgJNXsTqD6j3OugxJBMjN54rWdv8KjO2tLI4f4shpwBMPnb-R5ohNyZUAXq_nPFa_w"))

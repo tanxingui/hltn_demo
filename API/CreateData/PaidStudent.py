@@ -32,7 +32,6 @@ class PushStudentOrder:
         self.token = self.get_crm_login_token()
         self.front_sign_data = None
         self.cached_phone_list = None
-        # self.cached_phone_list = ["11272774832","11275130968","11276541681","14127808707"]
         self.importNum = None
 
     def get_base64(self, passwd):
@@ -197,8 +196,10 @@ class PushStudentOrder:
             "uat": {
                 "kc_package_skuId": '31825515',
                 "kc_order_amount": '0.02',
-                "mmears_package_skuId": '31830439',
-                "mmears_order_amount": '0.03',
+                # "mmears_package_skuId": '31830439',
+                # "mmears_order_amount": '0.03',
+                "mmears_package_skuId": '31828566',
+                "mmears_order_amount": '0.01',
                 "yz_package_skuId": '10025804',
                 "yz_order_amount": '2.3'
             },
@@ -443,7 +444,7 @@ class PushStudentOrder:
             if resp['code'] == 0:
                 unificationId = resp['data'][0]['unificationId']
                 userId = resp['data'][0]['userId']
-                print("手机号是：{}    大账户id是:{}    豌豆id是：{}".format(i, unificationId, userId))
+                print("大账户id:{}    豌豆id：{}    手机号：{}".format(unificationId, userId, i))
             else:
                 print("获取学员信息失败")
 
