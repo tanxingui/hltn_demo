@@ -29,7 +29,6 @@ def datetime_moli(days):
     time_tuple = datetime.datetime.now().date() + datetime.timedelta(days=days)
     return str(time_tuple) + " " + "00:00:00"
 
-
 def get_fixclassid(studentId, token):
     global starttime
     payload = {
@@ -98,7 +97,43 @@ def get_teacher_id(token):
             mysql_conn.close()
     return teacher_id
 
+def add_fixed_teacher_banci(token,teacherId):
+    url = "https://apistaging.mmears.com/teacher/fixed/class/saveTeacherFixedTimePeriod"
+    data = {'saveFixedCourseDTO': [{'week': 6, 'timeId': 1}, {'week': 7, 'timeId': 1}], 'teacherId': teacherId}
+    header = {"X-Auth-Token": token, "X-App-Id": "6"}
+    while True:
+        try:
+            response = requests.post(url, json=data, headers=header).json()
+            if response["code"] == "OK":
+                return 1
+            elif response["code"] == "BIZ_FAIL":
+                time.sleep(5)  # 等待5秒后继续调用该接口
+            else:
+                raise Exception("接口执行错误，并非排课中")
+        except Exception as e:
+            print("Error: ", e)
+            time.sleep(5)  # 等待5秒后重试
+
+
+def get_fixclassid1(studentId, clp_token):
+    payload = {"user_id": studentId}
+    clp_headers = {"Authorization": clp_token}
+    try:
+        for i in range(30):
+            response = requests.post("https://sht-eos-gateway.vipthink.cn/eos-lp/student/detail",
+                                     json=payload, headers=clp_headers)
+            courseId = response.json()["stu_info"]["mmears_info"]["fixed_course_id"]
+            if courseId:
+                return str(courseId)
+            if i < 29:
+                print(f"第 {i + 1} 次查询无数据，等待 60 秒后次查询!")
+                time.sleep(10)
+            else:
+                print("查询 30 次均无数据，该学员未成班!")
+                return 201
+    except Exception:
+        print("报错信息：", response.json()["info"])
 
 if __name__ == '__main__':
-    print(get_teacher_id(
-"eyJhbGciOiJIUzUxMiJ9.eyJzdWIiOiIxMzI1NiIsIm5hbWUiOiLosK3mlrDotLUiLCJzdXBwb3J0SWQiOm51bGwsImV4cCI6MTcwODY4NTU5MCwiaWF0IjoxNzA4NTk5MTkwLCJlbWFpbCI6InRhbnhpbmd1aUBobHRuLmNvbSJ9.eiMzV0RcdjvrMoVnVhQokgJNXsTqD6j3OugxJBMjN54rWdv8KjO2tLI4f4shpwBMPnb-R5ohNyZUAXq_nPFa_w"))
+    print(get_fixclassid1(18028578,
+                          "Bearer eyJhbGciOiJzaGEyNTYiLCJ0eXAiOiJKV1QifQ.W3sibmJmIjoxNzE5OTk4NTE2LCJpc3MiOiJkb2YiLCJ0emEiOiJDU1QiLCJleHAiOjE3MjAwODQ5MTYsImlhdCI6MTcxOTk5ODUxNiwic2lkIjoxfSx7InJhbmQiOiI3MjIzMDk0NjE1NzQ0ODc4NDU4ODIxOTA1NzI1MjI2ODUyODQxMDA2NTI4MDMxMTkxMzg1NzQ1MTk3OTcwMDQ0IiwidWlkIjo2Njc1MDgsInR5cCI6ImEiLCJ0aW1lIjoxNzE5OTk4NTE2fV0.YmFiZDRjYjNhMzdkOTEwNzAwMzcyNDBjMGMwNWY1OWM2NDBiZjc4NTAwZTQ0NWQ5YzU1MTBjMmEzMzNkMzcyYQ"))

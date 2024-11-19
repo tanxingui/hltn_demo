@@ -41,5 +41,7 @@ if __name__ == '__main__':
                 'Bearer eyJhbGciOiJzaGEyNTYiLCJ0eXAiOiJKV1QifQ.W3sibmJmIjoxNzA0MzQ5MDMxLCJpc3MiOiJkb2YiLCJ0emEiOiJDU1QiLCJleHAiOjE3MDQ0MzU0MzEsImlhdCI6MTcwNDM0OTAzMSwic2lkIjoxfSx7InJhbmQiOiIxNDE2NTk2OTI0MTkxNzk2OTIzNjA3NDA0NTYyOTIzMjMwMzAxNTY1NTk0NzczMDYyODM4NTE5NTM0MDA5ODM4IiwidWlkIjo1MTM0NywidHlwIjoiYSIsInRpbWUiOjE3MDQzNDkwMzF9XQ.NjU2YWExZjcwZjkzN2YzN2VlMzkwNzBkZTFiOWVjMzBiM2ZiYjU2MGM2ZDUxM2M0NzdmMjhmOGY5N2E1MThiNw')
           )
 
-
+# 数据库定期清理
+# delete from online.ol_live_class_student where class_id = 97594 and remain_live = 0 ;
+# delete from online.ol_live_student where live_id = 9381134 and check_status <> 0;
 

@@ -15,7 +15,7 @@ def get_base64(passwd):
     return b_pwd
 
 
-def uat_login(username=15979225192, passw='jnniey0924@'):
+def uat_login(username=19191919191, passw='a@123456789'):
     url = 'https://uat-auth-new.vipthink.cn/iam-sso/v2/auth/admin/token'
     data = {
         "account": username,
@@ -59,4 +59,4 @@ def add_ceshiclass():
 
 
 if __name__ == '__main__':
-    print(uat_login())
+    print(add_ceshiclass())

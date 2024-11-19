@@ -6,7 +6,7 @@ import json
 import time
 
 # 放初始学员
-user_id_iii = [259097, 216412, 22460660, 22460654, 9999127, 9999269, 9999280, 9999608]
+user_id_iii = [22546020]
 # 挑选最多相同星期几的学员
 '''9999127,
 9999269,
@@ -14,7 +14,7 @@ user_id_iii = [259097, 216412, 22460660, 22460654, 9999127, 9999269, 9999280, 99
 9999608'''
 
 # 鉴权
-authorization = 'eyJhbGciOiJIUzI1NiJ9.eyJkYXRhIjoiSUNwa01oNTYxMDVmck92TE1yUmJRamFkdFJjSTBscWUxYytZZCt3SEJuL3RsblRUYWpIamhEdE0zWDBhSkhBTW1ZSmxEeGxaWWVZZVhMSkMzcmIzcFBCWU0yaVJBbGlHZnBnaE9UV1pNcXYwSlRZYXNvSEFaai9VUnFrd0s1aWUxcERBZlVwUzJYdDFaQXQ5M1RmRHBVYlBXVUE4YW1mMnRWMnVUTThlSVE4VnpLLy9aZFh1TVF5OTB0aytzSnMwMGlxc0pOMmVla3l1MjkwQlhWVTY5Uy9FajZtYi94eGNZT1dxZ2NwbkxsQ0ZUWnZ4YzBWaTc4bW1mOG9HVkk0cE9tamxTRFJNb01rNUoxWkw0WmgzUGc9PSIsImV4cCI6MTcxMjQ4MzcwMH0.p6pfh7YvMqrI8OxE0BrUk7wsap4haKKJ0s9YYn8QJm8'
+authorization = 'eyJhbGciOiJIUzI1NiJ9.eyJkYXRhIjoiSUNwa01oNTYxMDVmck92TE1yUmJRamFkdFJjSTBscWUxYytZZCt3SEJuK3FRcnRoWHh0ZTdMZm40cFpUMFpCNW1ZSmxEeGxaWWVZZVhMSkMzcmIzcFBCWU0yaVJBbGlHZnBnaE9UV1pNcXYwSlRZYXNvSEFaai9VUnFrd0s1aWUxcERBZlVwUzJYdDFaQXQ5M1RmRHBaTDZBYXUvNUh0OWJlckdTNFJLN29sVXlkbVdvWHdQN2dhcTN0anUvNW5yZzlUL1pvY1ZtdENsVC9aSlo3dHZxZnpFQlRuZWN5ZXhPY21BZFdOZitUaksxL2NBajlQSW9YN3d0aEwzbHFQOG91Q2xzZTQ5Y2FQakFGaHVBbmdYdlc3YTJHT29zMk1rZHNuU2xwTkdrMm9kdFFseUhpbFVuZUpkY21aN3pYWWMiLCJleHAiOjE3Mzg0Nzc3OTZ9.-w4y9aR4xZwOfglS0ZVxND1YrZafhzq3oBvrA7N6Gl8'
 
 
 # 查询学员是周几上课的,获取周期中最多学员上课的一日
@@ -190,15 +190,15 @@ def cancelApply():
 if __name__ == '__main__':
     bengin_time = time.time()
     print('开始修改')
-    user_Id = [22620912,22621788,22621831]
+    user_Id = [22630511]
     # week()  # 查询学员是周几上课的,获取周期中最多学员上课的一日
     apply()  # 提交升阶分班
     # groupId()  # 查询所在班级id
-    updateteacher(400474)  # 修改成相同的授课老师 teacher_id = 100077   100060   100057   100066   100029  201922  100061
+    # updateteacher(400474)  # 修改成相同的授课老师 teacher_id = 100077   100060   100057   100066   100029  201922  100061
     # age()  # 修改年龄
     # kehao()   # 修改课耗
     # group_size()  # 修改扩班意向为八人班
-    level(9)  # 修改意向课程等级 L1=1  L2=5  L3=9  L4=13   高阶-经典艺术=17  高阶-设计艺术=21
+    level(17)  # 修改意向课程等级 L1=1  L2=5  L3=9  L4=13   高阶-经典艺术=17  高阶-设计艺术=21
     Class(28,2)  # 修改意向班级、意向时段   意向班级：28普通班，30中英班，31咕比班，29粤语班   后面这个参数是周几
     # cancelApply()  # 撤销升阶已选择
     print('修改完毕')

@@ -40,7 +40,7 @@ class PushStudentOrder:
 
     def subject(self):
         while True:
-            subject = input("请输入：(1)-->口才    (2)-->益智    (3)-->魔力")
+            subject = input("请输入：(1)-->口才    (2)-->益智    (3)-->魔力耳朵    (4)魔力剑桥")
             try:
                 subject = int(subject)
             except ValueError:
@@ -51,37 +51,28 @@ class PushStudentOrder:
             elif subject == 2:
                 return "益智"
             elif subject == 3:
-                return "魔力"
+                return "魔力耳朵"
+            elif subject == 4:
+                return "魔力剑桥"
             else:
-                print("请输入一个数字(1)/(2)获取正确的学科")
+                print("请输入一个数字1~4获取正确的学科")
                 continue
 
     def custom_phone_number(self):
         while True:
             custom_number = input("请输入你需要导单的手机号(用逗号隔开)，输入0则不需要自定义:-->")
-            try:
-                if custom_number == "0":
-                    return custom_number
-                elif custom_number == "":
-                    return str(0)
+            if custom_number == "0":
+                return custom_number
+            elif custom_number == "":
+                return str(0)
+            else:
+                custom_number = re.sub(r'[，，、。\s]+', ',', custom_number)
+                phone_numbers = custom_number.split(',')
+                # all() 函数用于判断给定的可迭代参数iterable中的所有元素是否都为 TRUE，如果是返回 True，否则返回 False
+                if all(len(phone.strip()) == 11 for phone in phone_numbers):
+                    return phone_numbers
                 else:
-                    # 将中英文逗号都替换为普通逗号
-                    custom_number = custom_number.replace('，', ',').replace('、', ',').replace('.', ',').replace('。',
-                                                                                                                ',').replace(
-                        ' ', ',')
-                    # 将字符串按逗号分隔，分别判断每手机号是否符合要求
-                    phone_numbers = custom_number.split(',')
-                    for phone_number in phone_numbers:
-                        # 去除空格
-                        phone_number = phone_number.strip()
-                        if len(phone_number) != 11:
-                            print("请输入11位数字的手机号")
-                            break
-                    else:  # 如果所有手机号都符合要求，返回它们的列表
-                        return phone_numbers
-            except ValueError:
-                print("输入错误，请输入数字")
-                continue
+                    print("请输入11位数字的手机号")
 
     def input_environment(self):
         while True:
@@ -196,21 +187,27 @@ class PushStudentOrder:
             "uat": {
                 "kc_package_skuId": '31825515',
                 "kc_order_amount": '0.02',
-                # "mmears_package_skuId": '31830439',
-                # "mmears_order_amount": '0.03',
-                "mmears_package_skuId": '31828566',
-                "mmears_order_amount": '0.01',
+                "mmears_package_skuId": '31831916',
+                "mmears_order_amount": '10',
+                # "mmears_package_skuId": '31828566',
+                # "mmears_order_amount": '0.01',
+                # "jianqiao_package_skuId": '31832305',
+                # "jianqiao_order_amount": '12.67',
+                "jianqiao_package_skuId": '31831672',
+                "jianqiao_order_amount": '0.01',
                 "yz_package_skuId": '10025804',
                 "yz_order_amount": '2.3'
             },
             "preprod": {
                 "kc_package_skuId": '20528464',
                 "kc_order_amount": '0.01',
-                "yz_package_skuId": '10016610',
-                "yz_order_amount": '0.01'
+                "yz_package_skuId": '10016745',
+                "yz_order_amount": '1',
+                "jianqiao_package_skuId": '20532903',
+                "jianqiao_order_amount": '9.99'
             }
         }
-        if self.subject == "口才" or self.subject == "魔力":
+        if self.subject == "口才" or self.subject == "魔力耳朵" or self.subject == "魔力剑桥":
             if self.environment in environment_settings:
                 settings = environment_settings[self.environment]
                 file_path = self.get_path('biaoda')
@@ -219,8 +216,8 @@ class PushStudentOrder:
 
                 # 清空表格的数据
                 if sheet.max_row > 2:
-                    # 行号是从1开始计数的，而不是从0开始，所以这里是3，
-                    for row in range(3, sheet.max_row + 1):
+                    # 从最后一行开始，逐行删除到第3行(第3行在模板里是首行)
+                    for row in range(sheet.max_row, 3, -1):
                         sheet.delete_rows(row)
 
                 for index, value in enumerate(data_list):
@@ -228,7 +225,7 @@ class PushStudentOrder:
                     sheet.cell(row=3 + index, column=4, value="86")  # 手机区号
                     sheet.cell(row=3 + index, column=10, value=formatted_datetime1)  # 支付时间
                     sheet.cell(row=3 + index, column=11, value="free")  # 支付方式
-                    sheet.cell(row=3 + index, column=12, value="0")  # 渠道id
+                    sheet.cell(row=3 + index, column=12, value="481608")  # 渠道id
                     sheet.cell(row=3 + index, column=13, value="1999")  # 获得原因
                     sheet.cell(row=3 + index, column=15, value="0")  # 是否需要地址
                     sheet.cell(row=3 + index, column=1, value=f'XG{formatted_datetime2}{value}')  # 第三方订单号
@@ -236,9 +233,12 @@ class PushStudentOrder:
                     if self.subject == "口才":
                         sheet.cell(row=3 + index, column=8, value=settings["kc_package_skuId"])  # 套餐skuid
                         sheet.cell(row=3 + index, column=9, value=settings["kc_order_amount"])  # 订单支付金额
-                    elif self.subject == "魔力":
+                    elif self.subject == "魔力耳朵":
                         sheet.cell(row=3 + index, column=8, value=settings["mmears_package_skuId"])  # 套餐skuid
                         sheet.cell(row=3 + index, column=9, value=settings["mmears_order_amount"])  # 订单支付金额
+                    elif self.subject == "魔力剑桥":
+                        sheet.cell(row=3 + index, column=8, value=settings["jianqiao_package_skuId"])  # 套餐skuid
+                        sheet.cell(row=3 + index, column=9, value=settings["jianqiao_order_amount"])  # 订单支付金额
                 workbook.save(file_path)
                 workbook.close()
         elif self.subject == "益智":
@@ -250,17 +250,17 @@ class PushStudentOrder:
 
                 # 清空表格的数据
                 if sheet.max_row > 2:
-                    # 行号是从1开始计数的，而不是从0开始，所以这里是3，
-                    for row in range(3, sheet.max_row + 1):
+                    # 从最后一行开始，逐行删除到第3行(第3行在模板里是首行)
+                    for row in range(sheet.max_row, 3, -1):
                         sheet.delete_rows(row)
 
                 for index, value in enumerate(data_list):
                     sheet.cell(row=3 + index, column=2, value='新贵测试')  # 用户姓名
                     sheet.cell(row=3 + index, column=3, value="86")  # 手机区号
                     sheet.cell(row=3 + index, column=5, value='')  # 学员id
-                    sheet.cell(row=3 + index, column=6, value=settings["yz_package_skuId"])  # 渠道id
+                    sheet.cell(row=3 + index, column=6, value="468078")  # 渠道id
                     sheet.cell(row=3 + index, column=7, value=settings["yz_package_skuId"])  # 套餐id
-                    sheet.cell(row=3 + index, column=8, value="2.3")  # 订单支付金额
+                    sheet.cell(row=3 + index, column=8, value=settings["yz_order_amount"])  # 订单支付金额
                     sheet.cell(row=3 + index, column=9, value=formatted_datetime1)  # 支付时间
                     sheet.cell(row=3 + index, column=10, value="第三方售卖")  # 支付方式
                     sheet.cell(row=3 + index, column=11, value="0")  # 收款渠道id
@@ -362,7 +362,7 @@ class PushStudentOrder:
         # 将 createTime 字符串转换为 datetime 对象
         create_time = datetime.strptime(data.get('createTime', ''), "%Y-%m-%d %H:%M:%S")
         current_time = datetime.now()
-        one_minute = timedelta(minutes=20)
+        one_minute = timedelta(minutes=2)
         # 获取两分钟内创建的第一个新订单
         if current_time - create_time < one_minute and data.get('fileName', '') == "biaoda.xlsx":
             return data.get('batchNum', '')
@@ -445,28 +445,29 @@ class PushStudentOrder:
                 unificationId = resp['data'][0]['unificationId']
                 userId = resp['data'][0]['userId']
                 print("大账户id:{}    豌豆id：{}    手机号：{}".format(unificationId, userId, i))
+
             else:
                 print("获取学员信息失败")
 
     # 最后执行的总函数
     def main(self):
-        if self.subject == "口才" or self.subject == "魔力":
+        if self.subject == "口才" or self.subject == "魔力耳朵" or self.subject == "魔力剑桥":
             try:
                 self.import_order()
                 self.last_auditing_order()
                 self.get_student_account()
-                time.sleep(6000)
+                time.sleep(600)
             except Exception as e:
                 print(f"异常：{e}")
-                time.sleep(2000)
+                time.sleep(200)
         elif self.subject == "益智":
             try:
                 self.yizhi_last_audit()
                 self.get_student_account()
-                time.sleep(6000)
+                time.sleep(600)
             except Exception as e:
                 print(f"异常：{e}")
-                time.sleep(2000)
+                time.sleep(200)
 
 
 if __name__ == '__main__':

@@ -1,59 +1,19 @@
-# debugtalk.py
-# 可以使用GLOBAL_VAR['']引用环境变量
-import json
-import MySQLdb
-import datetime
-from dateutil.relativedelta import relativedelta
+import requests,json,random
 
 
+def get_moli_mobile(token):
+    totalnum = 1
+    while totalnum != 0:
+        mobile = str("188") + str(random.randint(10000000, 99999999))
+        url = "https://sht-eos-gateway.vipthink.cn/cc-backend/today/getUserList"
+        data = {"nick_phone": mobile, "lru_flag": 1}
+        header = {"Content-Type": "application/json",
+                  "authorization": token}
+        res = requests.post(url, data=json.dumps(data), headers=header)
+        totalnum = json.loads(res.text)['data']['total']
+    else:
+        return mobile[0:11]
 
-class DBOperate:
-    def __init__(self):
-        self.host = 'testdb.61info.com'
-        self.port = 3306
-        self.user = 'root'
-        self.passwd = 'dbtest'
-
-    def sql_select(self, sql_expression):
-        self._connect()
-        try:
-            self.cur.execute(sql_expression)
-            result = self.cur.fetchall()
-            user = [user[0] for user in result]
-            return user[0]
-        except MySQLdb.Error as e:
-            print("Mysql Error select from account")
-            result = []
-        finally:
-            self._disconnect()
-
-
-    def _connect(self):
-        try_count = 0
-        while try_count < 2:
-            try_count = try_count + 1
-            try:
-                self.conn = MySQLdb.connect(
-                    host=self.host,
-                    port=self.port,
-                    user=self.user,
-                    passwd=self.passwd,
-                    charset='utf8'
-                )
-                # self.conn = sqlite3.connect('E:/workspace/11/db.sqlite3')
-                self.cur = self.conn.cursor()
-                break
-            except MySQLdb.Error as e:
-                print("Mysql Error %d: %s" % (e.args[0], e.args[1]))
-
-    def _disconnect(self):
-        # 关闭数据库连接
-        try:
-            self.cur.close()
-            self.conn.commit()
-            self.conn.close()
-        #             time.sleep(1)
-        except MySQLdb.Error as e:
-            print("Mysql Error %d: %s" % (e.args[0], e.args[1]))
-
-print(DBOperate().sql_select("SELECT user_status FROM `i61-hll-manager`.`user_daily_info` WHERE `user_id` = '22171';"))
+if __name__ == '__main__':
+    print(get_moli_mobile('Bearer eyJhbGciOiJzaGEyNTYiLCJ0eXAiOiJKV1QifQ.W3sibmJmIjoxNzIzMDg2NjAxLCJpc3MiOiJkb2YiLCJ0emEiOiJDU1QiLCJleHAiOjE3MjMxNzMwMDEsImlhdCI6MTcyMzA4NjYwMSwic2lkIjoxfSx7InJhbmQiOiI5NjkzODgzOTUyNjEzNzYyODM4MzgyNDE1MTUwMjkwMjUxNTA2OTYzNTI0MzM2NjY1ODUyMzc1MjQyNjI4NzM3IiwidWlkIjo2Njc1MDgsInR5cCI6ImEiLCJ0aW1lIjoxNzIzMDg2NjAxfV0.Yjg2ZmM0NWE4YjU0NGVlZDM2MDA1ODJhMjg5YjI3NjNkMzkxNGFlMmU2MDRhYmJjOTIzNGYzZWE2NDBhYTg1NQ'
+))
