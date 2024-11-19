@@ -104,5 +104,6 @@ class WorkdayCalculator:
 if __name__ == '__main__':
     calculator = WorkdayCalculator()
     calculator.start()
+    time.sleep(1)
     input("")
     calculator.stop()
