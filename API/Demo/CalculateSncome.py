@@ -6,9 +6,9 @@
 描述:
 """
 
-import re
-import time
+import time,threading,re
 from datetime import datetime, timedelta
+
 
 
 class WorkdayCalculator:
@@ -17,9 +17,17 @@ class WorkdayCalculator:
         self.work_days_month = work_days_month
         self.work_hours = work_hours
         self.lunch_break_duration = timedelta(hours=1, minutes=30)  # 午休1小时30分钟
+        self.timer_active = True
+        self.lock = threading.Lock()
+
+    def start(self):
+        threading.Thread(target=self.calculate_earnings).start()
+
+    def stop(self):
+        self.timer_active = False
 
     def input_starttime(self) -> str:
-        input_time = input("请输入今日上班打卡时间（格式为HH:MM）:")
+        input_time = input("请输入今日上班打卡时间（格式为HH:MM），按回车结束程序:")
         re_time = re.sub(r'[，.,、。：\s]+', ':', input_time)
         return re_time
 
@@ -70,7 +78,7 @@ class WorkdayCalculator:
             start_time = start_worktime
         else:
             start_time = start_time
-        while True:
+        while self.timer_active:
             now = datetime.now().time()
             end_time = self.calculate_end_time(start_time_str).time()
             # 将日期和时间结合起来
@@ -82,14 +90,19 @@ class WorkdayCalculator:
             # 计算今日收入
             earnings_today = work_hours_today * self.calculate_hourly_wage()
             # 计算距离下班还有多少秒
-            if now_datetime < end_datetime:
-                off_work_time = (end_datetime - now_datetime).total_seconds()
-                print(f"\r当前收入：{earnings_today:.2f}元 距离下班时间：{off_work_time:.0f}秒", end='')
-                time.sleep(1)
-            else:
-                print(f"已经下班了~  今日牛马费:{self.calculate_daily_wage():.2f}元")
-                break
+            with self.lock:
+                if now_datetime < end_datetime:
+                    off_work_time = (end_datetime - now_datetime).total_seconds()
+                    print(f"\r当前收入：{earnings_today:.2f}元    距离下班时间：{off_work_time:.0f}秒", end='')
+                    time.sleep(1)
+                else:
+                    print(f"已经下班了~  今日牛马费:{self.calculate_daily_wage():.2f}元")
+                    break
+        print("已退出程序")
 
 
 if __name__ == '__main__':
-    WorkdayCalculator().calculate_earnings()
+    calculator = WorkdayCalculator()
+    calculator.start()
+    input("")
+    calculator.stop()
