@@ -155,7 +155,7 @@ class Hualala_Script():
 
 if __name__ == '__main__':
     env_select = "test"  # 切换环境
-    userid = 22560704  #修改学员id
+    userid = 22634599  #修改学员id
     hualala_script = Hualala_Script(env_select)
     hualala_script.operate_student_cancel_classes(userid)   # 操作取消消课和同意消课审核
 

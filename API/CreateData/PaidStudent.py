@@ -76,19 +76,22 @@ class PushStudentOrder:
 
     def input_environment(self):
         while True:
-            environment = input("请输入：(1)-->测试环境    (2)-->预发布环境")
-            try:
-                environment = int(environment)
-            except ValueError:
-                print("输入错误，请输入数字")
-                continue
-            if environment == 1:
-                return "uat"
-            elif environment == 2:
-                return "preprod"
+            if self.subject != "魔力耳朵":
+                environment = input("请输入：(1)-->测试环境    (2)-->预发布环境")
+                try:
+                    environment = int(environment)
+                except ValueError:
+                    print("输入错误，请输入数字")
+                    continue
+                if environment == 1:
+                    return "uat"
+                elif environment == 2:
+                    return "preprod"
+                else:
+                    print("请输入一个数字(1)/(2)获取正确的环境")
+                    continue
             else:
-                print("请输入一个数字(1)/(2)获取正确的环境")
-                continue
+                return "uat"
 
     def input_num(self):
         while True:

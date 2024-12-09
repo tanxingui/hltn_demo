@@ -6,13 +6,12 @@
 描述:
 """
 
-import time,threading,re
+import time, threading, re
 from datetime import datetime, timedelta
 
 
-
 class WorkdayCalculator:
-    def __init__(self, monthly_salary=10000, work_days_month=22, work_hours=7.5):
+    def __init__(self, monthly_salary=17000, work_days_month=22, work_hours=7.5):
         self.monthly_salary = monthly_salary
         self.work_days_month = work_days_month
         self.work_hours = work_hours
@@ -89,7 +88,7 @@ class WorkdayCalculator:
             work_hours_today = (now_datetime - start_datetime).total_seconds() / 3600
             # 计算工时，不算上午休
             if start_time <= datetime.strptime('12:00', '%H:%M').time():
-                work_hours = round(work_hours_today, 2)-1.5
+                work_hours = round(work_hours_today, 2) - 1.5
             else:
                 work_hours = round(work_hours_today, 2)
             # 计算今日收入
@@ -98,7 +97,9 @@ class WorkdayCalculator:
             with self.lock:
                 if now_datetime < end_datetime:
                     off_work_time = (end_datetime - now_datetime).total_seconds()
-                    print(f"\r当前收入：{earnings_today:.2f}元   工时：{work_hours:.2f}   距离下班时间：{off_work_time:.0f}秒", end='')
+                    print(
+                        f"\r当前收入：{earnings_today:.2f}元   工时：{work_hours:.2f}   距离下班时间：{off_work_time:.0f}秒",
+                        end='')
                     time.sleep(1)
                 else:
                     print(f"已经下班了~  今日牛马费:{self.calculate_daily_wage():.2f}元")
