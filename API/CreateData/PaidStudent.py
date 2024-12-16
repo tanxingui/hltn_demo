@@ -40,14 +40,14 @@ class PushStudentOrder:
 
     def subject(self):
         while True:
-            subject = input("请输入：(1)-->口才    (2)-->益智    (3)-->魔力耳朵    (4)魔力剑桥")
+            subject = input("请输入：(1)-->表达    (2)-->益智    (3)-->魔力耳朵    (4)魔力剑桥")
             try:
                 subject = int(subject)
             except ValueError:
                 print("输入错误，请输入数字")
                 continue
             if subject == 1:
-                return "口才"
+                return "表达"
             elif subject == 2:
                 return "益智"
             elif subject == 3:
@@ -210,7 +210,7 @@ class PushStudentOrder:
                 "jianqiao_order_amount": '9.99'
             }
         }
-        if self.subject == "口才" or self.subject == "魔力耳朵" or self.subject == "魔力剑桥":
+        if self.subject == "表达" or self.subject == "魔力耳朵" or self.subject == "魔力剑桥":
             if self.environment in environment_settings:
                 settings = environment_settings[self.environment]
                 file_path = self.get_path('biaoda')
@@ -233,7 +233,7 @@ class PushStudentOrder:
                     sheet.cell(row=3 + index, column=15, value="0")  # 是否需要地址
                     sheet.cell(row=3 + index, column=1, value=f'XG{formatted_datetime2}{value}')  # 第三方订单号
                     sheet.cell(row=3 + index, column=5, value=value)  # 手机号
-                    if self.subject == "口才":
+                    if self.subject == "表达":
                         sheet.cell(row=3 + index, column=8, value=settings["kc_package_skuId"])  # 套餐skuid
                         sheet.cell(row=3 + index, column=9, value=settings["kc_order_amount"])  # 订单支付金额
                     elif self.subject == "魔力耳朵":
@@ -302,7 +302,7 @@ class PushStudentOrder:
             }
         return self.front_sign_data
 
-    # 口才导入订单
+    # 表达导入订单
     def import_order(self):
         self.update_file_to_cos()
         front_sign_data = self.get_front_sign()
@@ -380,7 +380,7 @@ class PushStudentOrder:
         record_dtl_ids = [item['recordDtlId'] for item in data]
         return record_dtl_ids
 
-    # 口才订单审批
+    # 表达订单审批
     def last_auditing_order(self):
         url = f'https://{self.environment}-gw.vipthink.cn/api/trade_order/v1/admin/orderImport/importRecord/auditDtls'
         for i in self.get_order_recordDtlId():
@@ -454,7 +454,7 @@ class PushStudentOrder:
 
     # 最后执行的总函数
     def main(self):
-        if self.subject == "口才" or self.subject == "魔力耳朵" or self.subject == "魔力剑桥":
+        if self.subject == "表达" or self.subject == "魔力耳朵" or self.subject == "魔力剑桥":
             try:
                 self.import_order()
                 self.last_auditing_order()

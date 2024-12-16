@@ -73,10 +73,7 @@ class WorkdayCalculator:
         start_worktime = datetime.strptime('09:30', '%H:%M').time()
         start_time = datetime.strptime(start_time_str, '%H:%M').time()
         # 判断9:30之前打卡的工资也是按9:30算
-        if start_time <= start_worktime:
-            start_time = start_worktime
-        else:
-            start_time = start_time
+        start_time = start_worktime if start_time <= start_worktime else start_time
         end_time = self.calculate_end_time(start_time_str).time()
         # 将日期和时间结合起来
         start_datetime = datetime.combine(datetime.today(), start_time)
@@ -84,13 +81,16 @@ class WorkdayCalculator:
         while self.timer_active:
             now = datetime.now().time()
             now_datetime = datetime.combine(datetime.today(), now)
-            # 计算今日工作时长，算上午休
+            # 计算今日工作时长，算上午休(拿来算收入)
             work_hours_today = (now_datetime - start_datetime).total_seconds() / 3600
+            # 计算今日工作时长，算上午休(拿来算工时)
+            work_hour_today = (now_datetime - datetime.combine(datetime.today(), (datetime.strptime(start_time_str, '%H:%M').time()))).total_seconds() / 3600
             # 计算工时，不算上午休
             if start_time <= datetime.strptime('12:00', '%H:%M').time():
-                work_hours = round(work_hours_today, 2) - 1.5
+                # round函数四舍五入，保留2为小数
+                work_hours = round(work_hour_today, 2) - 1.5
             else:
-                work_hours = round(work_hours_today, 2)
+                work_hours = round(work_hour_today, 2)
             # 计算今日收入
             earnings_today = work_hours_today * self.calculate_hourly_wage()
             # 计算距离下班还有多少秒
@@ -102,7 +102,7 @@ class WorkdayCalculator:
                         end='')
                     time.sleep(1)
                 else:
-                    print(f"已经下班了~  今日牛马费:{self.calculate_daily_wage():.2f}元")
+                    print(f"\n已经下班了~  今日牛马费:{self.calculate_daily_wage():.2f}元")
                     break
         print("已退出程序")
 
