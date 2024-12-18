@@ -6,6 +6,7 @@
 描述:
 """
 import base64
+import copy
 import json
 import os
 import re
@@ -40,7 +41,7 @@ class PushStudentOrder:
 
     def subject(self):
         while True:
-            subject = input("请输入：(1)-->表达    (2)-->益智    (3)-->魔力耳朵    (4)魔力剑桥")
+            subject = input("请输入：(1)-->表达    (2)-->益智    (3)-->魔力耳朵    (4)魔力剑桥    (5)所有学科")
             try:
                 subject = int(subject)
             except ValueError:
@@ -54,6 +55,8 @@ class PushStudentOrder:
                 return "魔力耳朵"
             elif subject == 4:
                 return "魔力剑桥"
+            elif subject == 5:
+                return "表达","益智","魔力耳朵","魔力耳朵"
             else:
                 print("请输入一个数字1~4获取正确的学科")
                 continue
@@ -210,70 +213,71 @@ class PushStudentOrder:
                 "jianqiao_order_amount": '9.99'
             }
         }
-        if self.subject == "表达" or self.subject == "魔力耳朵" or self.subject == "魔力剑桥":
-            if self.environment in environment_settings:
-                settings = environment_settings[self.environment]
-                file_path = self.get_path('biaoda')
-                workbook = openpyxl.load_workbook(file_path)
-                sheet = workbook["Sheet1"]
+        for subject in [self.subject]:
+            if subject == "表达" or subject == "魔力耳朵" or subject == "魔力剑桥":
+                if self.environment in environment_settings:
+                    settings = environment_settings[self.environment]
+                    file_path = self.get_path('biaoda')
+                    workbook = openpyxl.load_workbook(file_path)
+                    sheet = workbook["Sheet1"]
 
-                # 清空表格的数据
-                if sheet.max_row > 2:
-                    # 从最后一行开始，逐行删除到第3行(第3行在模板里是首行)
-                    for row in range(sheet.max_row, 3, -1):
-                        sheet.delete_rows(row)
+                    # 清空表格的数据
+                    if sheet.max_row > 2:
+                        # 从最后一行开始，逐行删除到第3行(第3行在模板里是首行)
+                        for row in range(sheet.max_row, 3, -1):
+                            sheet.delete_rows(row)
 
-                for index, value in enumerate(data_list):
-                    sheet.cell(row=3 + index, column=2, value='0')  # 收款渠道
-                    sheet.cell(row=3 + index, column=4, value="86")  # 手机区号
-                    sheet.cell(row=3 + index, column=10, value=formatted_datetime1)  # 支付时间
-                    sheet.cell(row=3 + index, column=11, value="free")  # 支付方式
-                    sheet.cell(row=3 + index, column=12, value="481608")  # 渠道id
-                    sheet.cell(row=3 + index, column=13, value="1999")  # 获得原因
-                    sheet.cell(row=3 + index, column=15, value="0")  # 是否需要地址
-                    sheet.cell(row=3 + index, column=1, value=f'XG{formatted_datetime2}{value}')  # 第三方订单号
-                    sheet.cell(row=3 + index, column=5, value=value)  # 手机号
-                    if self.subject == "表达":
-                        sheet.cell(row=3 + index, column=8, value=settings["kc_package_skuId"])  # 套餐skuid
-                        sheet.cell(row=3 + index, column=9, value=settings["kc_order_amount"])  # 订单支付金额
-                    elif self.subject == "魔力耳朵":
-                        sheet.cell(row=3 + index, column=8, value=settings["mmears_package_skuId"])  # 套餐skuid
-                        sheet.cell(row=3 + index, column=9, value=settings["mmears_order_amount"])  # 订单支付金额
-                    elif self.subject == "魔力剑桥":
-                        sheet.cell(row=3 + index, column=8, value=settings["jianqiao_package_skuId"])  # 套餐skuid
-                        sheet.cell(row=3 + index, column=9, value=settings["jianqiao_order_amount"])  # 订单支付金额
-                workbook.save(file_path)
-                workbook.close()
-        elif self.subject == "益智":
-            if self.environment in environment_settings:
-                settings = environment_settings[self.environment]
-                file_path = self.get_path('yizhi')
-                workbook = openpyxl.load_workbook(file_path)
-                sheet = workbook["导入主表"]
+                    for index, value in enumerate(data_list):
+                        sheet.cell(row=3 + index, column=2, value='0')  # 收款渠道
+                        sheet.cell(row=3 + index, column=4, value="86")  # 手机区号
+                        sheet.cell(row=3 + index, column=10, value=formatted_datetime1)  # 支付时间
+                        sheet.cell(row=3 + index, column=11, value="free")  # 支付方式
+                        sheet.cell(row=3 + index, column=12, value="481608")  # 渠道id
+                        sheet.cell(row=3 + index, column=13, value="1999")  # 获得原因
+                        sheet.cell(row=3 + index, column=15, value="0")  # 是否需要地址
+                        sheet.cell(row=3 + index, column=1, value=f'XG{formatted_datetime2}{value}')  # 第三方订单号
+                        sheet.cell(row=3 + index, column=5, value=value)  # 手机号
+                        if self.subject == "表达":
+                            sheet.cell(row=3 + index, column=8, value=settings["kc_package_skuId"])  # 套餐skuid
+                            sheet.cell(row=3 + index, column=9, value=settings["kc_order_amount"])  # 订单支付金额
+                        elif self.subject == "魔力耳朵":
+                            sheet.cell(row=3 + index, column=8, value=settings["mmears_package_skuId"])  # 套餐skuid
+                            sheet.cell(row=3 + index, column=9, value=settings["mmears_order_amount"])  # 订单支付金额
+                        elif self.subject == "魔力剑桥":
+                            sheet.cell(row=3 + index, column=8, value=settings["jianqiao_package_skuId"])  # 套餐skuid
+                            sheet.cell(row=3 + index, column=9, value=settings["jianqiao_order_amount"])  # 订单支付金额
+                    workbook.save(file_path)
+                    workbook.close()
+            elif subject == "益智":
+                if self.environment in environment_settings:
+                    settings = environment_settings[self.environment]
+                    file_path = self.get_path('yizhi')
+                    workbook = openpyxl.load_workbook(file_path)
+                    sheet = workbook["导入主表"]
 
-                # 清空表格的数据
-                if sheet.max_row > 2:
-                    # 从最后一行开始，逐行删除到第3行(第3行在模板里是首行)
-                    for row in range(sheet.max_row, 3, -1):
-                        sheet.delete_rows(row)
+                    # 清空表格的数据
+                    if sheet.max_row > 2:
+                        # 从最后一行开始，逐行删除到第3行(第3行在模板里是首行)
+                        for row in range(sheet.max_row, 3, -1):
+                            sheet.delete_rows(row)
 
-                for index, value in enumerate(data_list):
-                    sheet.cell(row=3 + index, column=2, value='新贵测试')  # 用户姓名
-                    sheet.cell(row=3 + index, column=3, value="86")  # 手机区号
-                    sheet.cell(row=3 + index, column=5, value='')  # 学员id
-                    sheet.cell(row=3 + index, column=6, value="468078")  # 渠道id
-                    sheet.cell(row=3 + index, column=7, value=settings["yz_package_skuId"])  # 套餐id
-                    sheet.cell(row=3 + index, column=8, value=settings["yz_order_amount"])  # 订单支付金额
-                    sheet.cell(row=3 + index, column=9, value=formatted_datetime1)  # 支付时间
-                    sheet.cell(row=3 + index, column=10, value="第三方售卖")  # 支付方式
-                    sheet.cell(row=3 + index, column=11, value="0")  # 收款渠道id
-                    sheet.cell(row=3 + index, column=12, value="1999")  # 获得原因
-                    sheet.cell(row=3 + index, column=13, value="")  # 父订单号
-                    sheet.cell(row=3 + index, column=15, value="0")  # 是否需要地址
-                    sheet.cell(row=3 + index, column=1, value=f'XG{formatted_datetime2}{value}')  # 外部订单号
-                    sheet.cell(row=3 + index, column=4, value=value)  # 手机号
-                workbook.save(file_path)
-                workbook.close()
+                    for index, value in enumerate(data_list):
+                        sheet.cell(row=3 + index, column=2, value='新贵测试')  # 用户姓名
+                        sheet.cell(row=3 + index, column=3, value="86")  # 手机区号
+                        sheet.cell(row=3 + index, column=5, value='')  # 学员id
+                        sheet.cell(row=3 + index, column=6, value="468078")  # 渠道id
+                        sheet.cell(row=3 + index, column=7, value=settings["yz_package_skuId"])  # 套餐id
+                        sheet.cell(row=3 + index, column=8, value=settings["yz_order_amount"])  # 订单支付金额
+                        sheet.cell(row=3 + index, column=9, value=formatted_datetime1)  # 支付时间
+                        sheet.cell(row=3 + index, column=10, value="第三方售卖")  # 支付方式
+                        sheet.cell(row=3 + index, column=11, value="0")  # 收款渠道id
+                        sheet.cell(row=3 + index, column=12, value="1999")  # 获得原因
+                        sheet.cell(row=3 + index, column=13, value="")  # 父订单号
+                        sheet.cell(row=3 + index, column=15, value="0")  # 是否需要地址
+                        sheet.cell(row=3 + index, column=1, value=f'XG{formatted_datetime2}{value}')  # 外部订单号
+                        sheet.cell(row=3 + index, column=4, value=value)  # 手机号
+                    workbook.save(file_path)
+                    workbook.close()
 
     # 获取导入订单需要的数据
     def get_front_sign(self):
@@ -454,23 +458,20 @@ class PushStudentOrder:
 
     # 最后执行的总函数
     def main(self):
-        if self.subject == "表达" or self.subject == "魔力耳朵" or self.subject == "魔力剑桥":
-            try:
-                self.import_order()
-                self.last_auditing_order()
-                self.get_student_account()
-                time.sleep(600)
-            except Exception as e:
-                print(f"异常：{e}")
-                time.sleep(200)
-        elif self.subject == "益智":
-            try:
-                self.yizhi_last_audit()
-                self.get_student_account()
-                time.sleep(600)
-            except Exception as e:
-                print(f"异常：{e}")
-                time.sleep(200)
+        for subject in [self.subject]:
+            if subject == "表达" or subject == "魔力耳朵" or subject == "魔力剑桥":
+                try:
+                    self.import_order()
+                    self.last_auditing_order()
+                    self.get_student_account()
+                except Exception as e:
+                    print(f"异常：{e}")
+            elif subject == "益智":
+                try:
+                    self.yizhi_last_audit()
+                    self.get_student_account()
+                except Exception as e:
+                    print(f"异常：{e}")
 
 
 if __name__ == '__main__':
