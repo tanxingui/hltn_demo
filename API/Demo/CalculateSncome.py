@@ -95,7 +95,7 @@ class WorkdayCalculator:
             earnings_today = work_hours_today * self.calculate_hourly_wage()
             # 计算距离下班还有多少秒
             with self.lock:
-                if now_datetime < end_datetime:
+                if now_datetime <= end_datetime:
                     off_work_time = (end_datetime - now_datetime).total_seconds()
                     print(
                         f"\r当前收入：{earnings_today:.2f}元   工时：{work_hours:.2f}   距离下班时间：{off_work_time:.0f}秒",

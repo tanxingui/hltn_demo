@@ -6,7 +6,6 @@
 描述:
 """
 import base64
-import copy
 import json
 import os
 import re
@@ -41,16 +40,22 @@ class PushStudentOrder:
 
     def subject(self):
         while True:
-            subject = input("请输入：(1)-->表达    (2)-->益智    (3)-->魔力耳朵    (4)魔力剑桥    (5)所有学科")
+            subject = input("请输入：(1)-->表达    (2)-->益智    (3)-->魔力耳朵    (4)魔力剑桥")
             try:
                 subject = int(subject)
             except ValueError:
                 print("输入错误，请输入数字")
                 continue
-            if subject in [1, 2, 3, 4, 5]:
-                return ["表达", "益智", "魔力耳朵", "魔力剑桥"][subject-1] if subject < 5 else "表达", "益智", "魔力耳朵", "魔力剑桥"
+            if subject == 1:
+                return "表达"
+            elif subject == 2:
+                return "益智"
+            elif subject == 3:
+                return "魔力耳朵"
+            elif subject == 4:
+                return "魔力剑桥"
             else:
-                print("请输入一个数字1~5获取正确的学科")
+                print("请输入一个数字1~4获取正确的学科")
                 continue
 
     def custom_phone_number(self):
@@ -136,40 +141,82 @@ class PushStudentOrder:
             print("登录出错")
 
     # 获取系统没有重复使用的手机号
+    def _generate_new_phones(self, count):
+        """
+        根据当前时间戳生成新的手机号列表。
+        """
+        new_phones = set()  # 使用集合来存储新手机号，避免重复
+        for _ in range(count):
+            now = time.time()
+            new_phone = '1' + str(now).replace('.', '')[-10:]
+            new_phones.add(new_phone)
+        return new_phones
+
+    def _check_existing_phones(self, new_phones):
+        """
+        检查生成的手机号是否在系统中已经存在。
+        """
+        phone_list = []
+        for new_phone in new_phones:
+            url = f'https://{self.environment}-gw.vipthink.cn/api/member/v3/back/ol-user/getUserInfoByMobile'
+            payload = {"mobile": new_phone}
+            # 发起API请求，检查手机号是否存在
+            resp = self.handle_api_response(requests.post(url, json=payload, headers={"authorization": self.token}))
+            if resp and resp.get('code') == 0 and not resp.get('data'):
+                phone_list.append(new_phone)
+        return phone_list
+
     def get_student_phone(self) -> list:
-        # 检查结果是否已经缓存
+        # 如果已经缓存了手机号列表，则直接返回
         if self.cached_phone_list is not None:
             return self.cached_phone_list
-        phone_list = []
-        # 判断是否需要自定义手机号
+
+        self.cached_phone_list = []
         if self.custom_number == "0":
-            try:
-                for i in range(self.num):
-                    now = time.time()
-                    new_phone = '1' + str(now).replace('.', '')[-10:]
-                    url = f'https://{self.environment}-gw.vipthink.cn/api/member/v3/back/ol-user/getUserInfoByMobile'
-                    payload = {"mobile": f"{new_phone}"}
-                    resp = self.handle_api_response(
-                        requests.post(url, json=payload, headers={"authorization": self.token}))
-                    if resp and resp.get('code') == 0 and not resp.get('data'):
-                        if phone_list != []:
-                            # 判断列表中有没有相同的手机号码
-                            if new_phone in [i for i in phone_list]:
-                                if int(new_phone[-1:]) != 9:
-                                    # \d表示匹配一个数字字符，$表示匹配字符串的结尾位置
-                                    phone_list.append(re.sub(r'\d$', str(int(new_phone[-1:]) + 1), new_phone))
-                                else:
-                                    phone_list.append(re.sub(r'\d$', str(int(new_phone[-1:]) - 1), new_phone))
-                            else:
-                                phone_list.append(new_phone)
-                        else:
-                            phone_list.append(new_phone)
-            except TypeError as error:
-                print('API request exception, please check\n', 'error:', error)
-            self.cached_phone_list = phone_list
-            return phone_list
+            phone_count = self.num
+            while len(self.cached_phone_list) < phone_count:
+                phones = self._generate_new_phones(phone_count - len(self.cached_phone_list))
+                new_phones = self._check_existing_phones(phones)
+                # 将检查通过的新手机号添加到缓存列表中
+                self.cached_phone_list.extend(new_phones)
         else:
-            return self.custom_number
+            self.cached_phone_list = self.custom_number
+
+        return self.cached_phone_list
+    # def get_student_phone(self) -> list:
+    #     # 检查结果是否已经缓存
+    #     if self.cached_phone_list is not None:
+    #         return self.cached_phone_list
+    #     phone_list = []
+    #     # 判断是否需要自定义手机号
+    #     if self.custom_number == "0":
+    #         try:
+    #             for i in range(self.num):
+    #                 now = time.time()
+    #                 new_phone = '1' + str(now).replace('.', '')[-10:]
+    #                 url = f'https://{self.environment}-gw.vipthink.cn/api/member/v3/back/ol-user/getUserInfoByMobile'
+    #                 payload = {"mobile": f"{new_phone}"}
+    #                 resp = self.handle_api_response(
+    #                     requests.post(url, json=payload, headers={"authorization": self.token}))
+    #                 if resp and resp.get('code') == 0 and not resp.get('data'):
+    #                     if phone_list != []:
+    #                         # 判断列表中有没有相同的手机号码
+    #                         if new_phone in [i for i in phone_list]:
+    #                             if int(new_phone[-1:]) != 9:
+    #                                 # \d表示匹配一个数字字符，$表示匹配字符串的结尾位置
+    #                                 phone_list.append(re.sub(r'\d$', str(int(new_phone[-1:]) + 1), new_phone))
+    #                             else:
+    #                                 phone_list.append(re.sub(r'\d$', str(int(new_phone[-1:]) - 1), new_phone))
+    #                         else:
+    #                             phone_list.append(new_phone)
+    #                     else:
+    #                         phone_list.append(new_phone)
+    #         except TypeError as error:
+    #             print('API request exception, please check\n', 'error:', error)
+    #         self.cached_phone_list = phone_list
+    #         return phone_list
+    #     else:
+    #         return self.custom_number
 
     # 操作需要上传的表格
     def operation_table(self):
@@ -205,71 +252,70 @@ class PushStudentOrder:
                 "jianqiao_order_amount": '9.99'
             }
         }
-        for subject in list(self.subject):
-            if subject in ["表达", "魔力耳朵", "魔力剑桥"]:
-                if self.environment in environment_settings:
-                    settings = environment_settings[self.environment]
-                    file_path = self.get_path('biaoda')
-                    workbook = openpyxl.load_workbook(file_path)
-                    sheet = workbook["Sheet1"]
+        if self.subject in ("表达", "魔力耳朵", "魔力剑桥"):
+            if self.environment in environment_settings:
+                settings = environment_settings[self.environment]
+                file_path = self.get_path('biaoda')
+                workbook = openpyxl.load_workbook(file_path)
+                sheet = workbook["Sheet1"]
 
-                    # 清空表格的数据
-                    if sheet.max_row > 2:
-                        # 从最后一行开始，逐行删除到第3行(第3行在模板里是首行)
-                        for row in range(sheet.max_row, 3, -1):
-                            sheet.delete_rows(row)
+                # 清空表格的数据
+                if sheet.max_row > 2:
+                    # 从最后一行开始，逐行删除到第3行(第3行在模板里是首行)
+                    for row in range(sheet.max_row, 3, -1):
+                        sheet.delete_rows(row)
 
-                    for index, value in enumerate(data_list):
-                        sheet.cell(row=3 + index, column=2, value='0')  # 收款渠道
-                        sheet.cell(row=3 + index, column=4, value="86")  # 手机区号
-                        sheet.cell(row=3 + index, column=10, value=formatted_datetime1)  # 支付时间
-                        sheet.cell(row=3 + index, column=11, value="free")  # 支付方式
-                        sheet.cell(row=3 + index, column=12, value="481608")  # 渠道id
-                        sheet.cell(row=3 + index, column=13, value="1999")  # 获得原因
-                        sheet.cell(row=3 + index, column=15, value="0")  # 是否需要地址
-                        sheet.cell(row=3 + index, column=1, value=f'XG{formatted_datetime2}{value}')  # 第三方订单号
-                        sheet.cell(row=3 + index, column=5, value=value)  # 手机号
-                        if self.subject == "表达":
-                            sheet.cell(row=3 + index, column=8, value=settings["kc_package_skuId"])  # 套餐skuid
-                            sheet.cell(row=3 + index, column=9, value=settings["kc_order_amount"])  # 订单支付金额
-                        elif self.subject == "魔力耳朵":
-                            sheet.cell(row=3 + index, column=8, value=settings["mmears_package_skuId"])  # 套餐skuid
-                            sheet.cell(row=3 + index, column=9, value=settings["mmears_order_amount"])  # 订单支付金额
-                        elif self.subject == "魔力剑桥":
-                            sheet.cell(row=3 + index, column=8, value=settings["jianqiao_package_skuId"])  # 套餐skuid
-                            sheet.cell(row=3 + index, column=9, value=settings["jianqiao_order_amount"])  # 订单支付金额
-                    workbook.save(file_path)
-                    workbook.close()
-            elif subject == "益智":
-                if self.environment in environment_settings:
-                    settings = environment_settings[self.environment]
-                    file_path = self.get_path('yizhi')
-                    workbook = openpyxl.load_workbook(file_path)
-                    sheet = workbook["导入主表"]
+                for index, value in enumerate(data_list):
+                    sheet.cell(row=3 + index, column=2, value='0')  # 收款渠道
+                    sheet.cell(row=3 + index, column=4, value="86")  # 手机区号
+                    sheet.cell(row=3 + index, column=10, value=formatted_datetime1)  # 支付时间
+                    sheet.cell(row=3 + index, column=11, value="free")  # 支付方式
+                    sheet.cell(row=3 + index, column=12, value="481608")  # 渠道id
+                    sheet.cell(row=3 + index, column=13, value="1999")  # 获得原因
+                    sheet.cell(row=3 + index, column=15, value="0")  # 是否需要地址
+                    sheet.cell(row=3 + index, column=1, value=f'XG{formatted_datetime2}{value}')  # 第三方订单号
+                    sheet.cell(row=3 + index, column=5, value=value)  # 手机号
+                    if self.subject == "表达":
+                        sheet.cell(row=3 + index, column=8, value=settings["kc_package_skuId"])  # 套餐skuid
+                        sheet.cell(row=3 + index, column=9, value=settings["kc_order_amount"])  # 订单支付金额
+                    elif self.subject == "魔力耳朵":
+                        sheet.cell(row=3 + index, column=8, value=settings["mmears_package_skuId"])  # 套餐skuid
+                        sheet.cell(row=3 + index, column=9, value=settings["mmears_order_amount"])  # 订单支付金额
+                    elif self.subject == "魔力剑桥":
+                        sheet.cell(row=3 + index, column=8, value=settings["jianqiao_package_skuId"])  # 套餐skuid
+                        sheet.cell(row=3 + index, column=9, value=settings["jianqiao_order_amount"])  # 订单支付金额
+                workbook.save(file_path)
+                workbook.close()
+        elif self.subject == "益智":
+            if self.environment in environment_settings:
+                settings = environment_settings[self.environment]
+                file_path = self.get_path('yizhi')
+                workbook = openpyxl.load_workbook(file_path)
+                sheet = workbook["导入主表"]
 
-                    # 清空表格的数据
-                    if sheet.max_row > 2:
-                        # 从最后一行开始，逐行删除到第3行(第3行在模板里是首行)
-                        for row in range(sheet.max_row, 3, -1):
-                            sheet.delete_rows(row)
+                # 清空表格的数据
+                if sheet.max_row > 2:
+                    # 从最后一行开始，逐行删除到第3行(第3行在模板里是首行)
+                    for row in range(sheet.max_row, 3, -1):
+                        sheet.delete_rows(row)
 
-                    for index, value in enumerate(data_list):
-                        sheet.cell(row=3 + index, column=2, value='新贵测试')  # 用户姓名
-                        sheet.cell(row=3 + index, column=3, value="86")  # 手机区号
-                        sheet.cell(row=3 + index, column=5, value='')  # 学员id
-                        sheet.cell(row=3 + index, column=6, value="468078")  # 渠道id
-                        sheet.cell(row=3 + index, column=7, value=settings["yz_package_skuId"])  # 套餐id
-                        sheet.cell(row=3 + index, column=8, value=settings["yz_order_amount"])  # 订单支付金额
-                        sheet.cell(row=3 + index, column=9, value=formatted_datetime1)  # 支付时间
-                        sheet.cell(row=3 + index, column=10, value="第三方售卖")  # 支付方式
-                        sheet.cell(row=3 + index, column=11, value="0")  # 收款渠道id
-                        sheet.cell(row=3 + index, column=12, value="1999")  # 获得原因
-                        sheet.cell(row=3 + index, column=13, value="")  # 父订单号
-                        sheet.cell(row=3 + index, column=15, value="0")  # 是否需要地址
-                        sheet.cell(row=3 + index, column=1, value=f'XG{formatted_datetime2}{value}')  # 外部订单号
-                        sheet.cell(row=3 + index, column=4, value=value)  # 手机号
-                    workbook.save(file_path)
-                    workbook.close()
+                for index, value in enumerate(data_list):
+                    sheet.cell(row=3 + index, column=2, value='新贵测试')  # 用户姓名
+                    sheet.cell(row=3 + index, column=3, value="86")  # 手机区号
+                    sheet.cell(row=3 + index, column=5, value='')  # 学员id
+                    sheet.cell(row=3 + index, column=6, value="468078")  # 渠道id
+                    sheet.cell(row=3 + index, column=7, value=settings["yz_package_skuId"])  # 套餐id
+                    sheet.cell(row=3 + index, column=8, value=settings["yz_order_amount"])  # 订单支付金额
+                    sheet.cell(row=3 + index, column=9, value=formatted_datetime1)  # 支付时间
+                    sheet.cell(row=3 + index, column=10, value="第三方售卖")  # 支付方式
+                    sheet.cell(row=3 + index, column=11, value="0")  # 收款渠道id
+                    sheet.cell(row=3 + index, column=12, value="1999")  # 获得原因
+                    sheet.cell(row=3 + index, column=13, value="")  # 父订单号
+                    sheet.cell(row=3 + index, column=15, value="0")  # 是否需要地址
+                    sheet.cell(row=3 + index, column=1, value=f'XG{formatted_datetime2}{value}')  # 外部订单号
+                    sheet.cell(row=3 + index, column=4, value=value)  # 手机号
+                workbook.save(file_path)
+                workbook.close()
 
     # 获取导入订单需要的数据
     def get_front_sign(self):
@@ -450,20 +496,23 @@ class PushStudentOrder:
 
     # 最后执行的总函数
     def main(self):
-        for subject in list(self.subject):
-            if subject in ["表达", "魔力耳朵", "魔力剑桥"]:
-                try:
-                    self.import_order()
-                    self.last_auditing_order()
-                    self.get_student_account()
-                except Exception as e:
-                    print(f"异常：{e}")
-            elif subject == "益智":
-                try:
-                    self.yizhi_last_audit()
-                    self.get_student_account()
-                except Exception as e:
-                    print(f"异常：{e}")
+        if self.subject == "表达" or self.subject == "魔力耳朵" or self.subject == "魔力剑桥":
+            try:
+                self.import_order()
+                self.last_auditing_order()
+                self.get_student_account()
+                time.sleep(600)
+            except Exception as e:
+                print(f"异常：{e}")
+                time.sleep(200)
+        elif self.subject == "益智":
+            try:
+                self.yizhi_last_audit()
+                self.get_student_account()
+                time.sleep(600)
+            except Exception as e:
+                print(f"异常：{e}")
+                time.sleep(200)
 
 
 if __name__ == '__main__':
