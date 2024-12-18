@@ -47,18 +47,10 @@ class PushStudentOrder:
             except ValueError:
                 print("输入错误，请输入数字")
                 continue
-            if subject == 1:
-                return "表达"
-            elif subject == 2:
-                return "益智"
-            elif subject == 3:
-                return "魔力耳朵"
-            elif subject == 4:
-                return "魔力剑桥"
-            elif subject == 5:
-                return "表达","益智","魔力耳朵","魔力耳朵"
+            if subject in [1, 2, 3, 4, 5]:
+                return ["表达", "益智", "魔力耳朵", "魔力剑桥"][subject-1] if subject < 5 else "表达", "益智", "魔力耳朵", "魔力剑桥"
             else:
-                print("请输入一个数字1~4获取正确的学科")
+                print("请输入一个数字1~5获取正确的学科")
                 continue
 
     def custom_phone_number(self):
@@ -213,8 +205,8 @@ class PushStudentOrder:
                 "jianqiao_order_amount": '9.99'
             }
         }
-        for subject in [self.subject]:
-            if subject == "表达" or subject == "魔力耳朵" or subject == "魔力剑桥":
+        for subject in list(self.subject):
+            if subject in ["表达", "魔力耳朵", "魔力剑桥"]:
                 if self.environment in environment_settings:
                     settings = environment_settings[self.environment]
                     file_path = self.get_path('biaoda')
@@ -458,8 +450,8 @@ class PushStudentOrder:
 
     # 最后执行的总函数
     def main(self):
-        for subject in [self.subject]:
-            if subject == "表达" or subject == "魔力耳朵" or subject == "魔力剑桥":
+        for subject in list(self.subject):
+            if subject in ["表达", "魔力耳朵", "魔力剑桥"]:
                 try:
                     self.import_order()
                     self.last_auditing_order()
