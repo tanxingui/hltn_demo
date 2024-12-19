@@ -140,11 +140,8 @@ class PushStudentOrder:
         else:
             print("登录出错")
 
-    # 获取系统没有重复使用的手机号
+    # 根据当前时间戳生成新的手机号列表。
     def _generate_new_phones(self, count):
-        """
-        根据当前时间戳生成新的手机号列表。
-        """
         new_phones = set()  # 使用集合来存储新手机号，避免重复
         for _ in range(count):
             now = time.time()
@@ -152,22 +149,18 @@ class PushStudentOrder:
             new_phones.add(new_phone)
         return new_phones
 
+    # 检查生成的手机号是否在系统中已经存在。
     def _check_existing_phones(self, new_phones):
-        """
-        检查生成的手机号是否在系统中已经存在。
-        """
         phone_list = []
         for new_phone in new_phones:
             url = f'https://{self.environment}-gw.vipthink.cn/api/member/v3/back/ol-user/getUserInfoByMobile'
             payload = {"mobile": new_phone}
-            # 发起API请求，检查手机号是否存在
             resp = self.handle_api_response(requests.post(url, json=payload, headers={"authorization": self.token}))
             if resp and resp.get('code') == 0 and not resp.get('data'):
                 phone_list.append(new_phone)
         return phone_list
 
     def get_student_phone(self) -> list:
-        # 如果已经缓存了手机号列表，则直接返回
         if self.cached_phone_list is not None:
             return self.cached_phone_list
 
@@ -183,6 +176,7 @@ class PushStudentOrder:
             self.cached_phone_list = self.custom_number
 
         return self.cached_phone_list
+
     # def get_student_phone(self) -> list:
     #     # 检查结果是否已经缓存
     #     if self.cached_phone_list is not None:
@@ -496,7 +490,7 @@ class PushStudentOrder:
 
     # 最后执行的总函数
     def main(self):
-        if self.subject == "表达" or self.subject == "魔力耳朵" or self.subject == "魔力剑桥":
+        if self.subject in ("表达", "魔力耳朵", "魔力剑桥"):
             try:
                 self.import_order()
                 self.last_auditing_order()
