@@ -40,27 +40,18 @@ class PushStudentOrder:
 
     def subject(self):
         while True:
-            subject = input("请输入：(1)-->表达    (2)-->益智    (3)-->魔力耳朵    (4)魔力剑桥")
             try:
-                subject = int(subject)
+                choice = int(input("请输入：(1)表达  (2)益智  (3)魔力耳朵  (4)魔力剑桥-->"))
+                if 1 <= choice <= 4:
+                    return [["表达", "益智", "魔力耳朵", "魔力剑桥"][choice - 1]]
+                else:
+                    print("请输入一个数字1~5获取正确的学科")
             except ValueError:
                 print("输入错误，请输入数字")
-                continue
-            if subject == 1:
-                return "表达"
-            elif subject == 2:
-                return "益智"
-            elif subject == 3:
-                return "魔力耳朵"
-            elif subject == 4:
-                return "魔力剑桥"
-            else:
-                print("请输入一个数字1~4获取正确的学科")
-                continue
 
     def custom_phone_number(self):
         while True:
-            custom_number = input("请输入你需要导单的手机号(用逗号隔开)，输入0则不需要自定义:-->")
+            custom_number = input("请输入：你需要导单的手机号(用逗号隔开)，输入0则不需要自定义-->")
             if custom_number == "0":
                 return custom_number
             elif custom_number == "":
@@ -75,55 +66,51 @@ class PushStudentOrder:
                     print("请输入11位数字的手机号")
 
     def input_environment(self):
+        if self.subject == "魔力耳朵":
+            return "uat"
+
         while True:
-            if self.subject != "魔力耳朵":
-                environment = input("请输入：(1)-->测试环境    (2)-->预发布环境")
-                try:
-                    environment = int(environment)
-                except ValueError:
-                    print("输入错误，请输入数字")
-                    continue
+            try:
+                environment = int(input("请输入：(1)测试环境  (2)预发布环境-->"))
                 if environment == 1:
                     return "uat"
                 elif environment == 2:
                     return "preprod"
                 else:
-                    print("请输入一个数字(1)/(2)获取正确的环境")
-                    continue
-            else:
-                return "uat"
+                    print("输入错误，请输入数字1或2")
+            except ValueError:
+                print("输入错误，请输入数字")
 
     def input_num(self):
         while True:
-            num = input(f"请输入{self.environment}环境需要导入的订单条数:")
+            num_str = input(f"请输入：{self.environment}环境需要导入的订单条数-->")
             try:
-                num = int(num)
+                num = int(num_str)
+                if 0 < num <= 100:
+                    return num
+                else:
+                    print("请输入大于0，小于或等于100的数字")
             except ValueError:
                 print("输入错误，请输入数字")
-                continue
-            if 0 < num <= 100:
-                return num
-            else:
-                print("请输入大于0，小于100的数字")
-                continue
 
     def handle_api_response(self, response):
         try:
-            # 检查HTTP响应是否成功
             response.raise_for_status()
-            # 尝试解析响应
             resp_json = response.json()
-            if resp_json['code'] == 0 or resp_json['code'] == 200 or resp_json['success'] == "true":
+            if resp_json.get('code') in (0, 200) or resp_json.get('success') == "true":
                 return resp_json
             else:
-                return {"error": f"API响应错误: {resp_json['msg']}"}
-        except (requests.exceptions.RequestException, json.decoder.JSONDecodeError, KeyError) as e:
-            # 返回一个包含错误信息的字典
+                return {"error": f"API响应错误: {resp_json.get('msg', '未知错误')}"}
+        except (requests.exceptions.RequestException, json.JSONDecodeError, KeyError) as e:
             return {"error": f"操作失败！请求错误: {e}"}
 
-    def get_path(self, file_name):
-        file_local_path_name = os.path.join(os.path.dirname(os.path.realpath(__file__)), f"{file_name}.xlsx")
-        return file_local_path_name
+    def get_excel_file_path(self, file_name):
+        current_dir = os.path.dirname(os.path.realpath(__file__))
+        file_path = os.path.join(current_dir, f"{file_name}.xlsx")
+        # 检查文件是否存在
+        if not os.path.isfile(file_path):
+            raise FileNotFoundError(f"文件 {file_path} 不存在。")
+        return file_path
 
     # 获取crm登录的token
     def get_crm_login_token(self, username=18707699952, passw='klzz1234@@'):
@@ -249,7 +236,7 @@ class PushStudentOrder:
         if self.subject in ("表达", "魔力耳朵", "魔力剑桥"):
             if self.environment in environment_settings:
                 settings = environment_settings[self.environment]
-                file_path = self.get_path('biaoda')
+                file_path = self.get_excel_file_path('biaoda')
                 workbook = openpyxl.load_workbook(file_path)
                 sheet = workbook["Sheet1"]
 
@@ -283,7 +270,7 @@ class PushStudentOrder:
         elif self.subject == "益智":
             if self.environment in environment_settings:
                 settings = environment_settings[self.environment]
-                file_path = self.get_path('yizhi')
+                file_path = self.get_excel_file_path('yizhi')
                 workbook = openpyxl.load_workbook(file_path)
                 sheet = workbook["导入主表"]
 
@@ -378,7 +365,7 @@ class PushStudentOrder:
                 config = CosConfig(Region=region, SecretId=secret_id, SecretKey=secret_key, Token=token,
                                    Domain=Bucket + domain)
                 client = CosS3Client(config)
-                with open(self.get_path('biaoda'), 'rb') as fp:
+                with open(self.get_excel_file_path('biaoda'), 'rb') as fp:
                     response = client.put_object(
                         Bucket='test-1253622427',
                         Body=fp,
@@ -438,7 +425,7 @@ class PushStudentOrder:
             return self.importNum
         self.operation_table()
         url = f'https://{self.environment}-order.vipthink.cn/order/v1/order/import'
-        files = {'file': ('yizhi.xlsx', open(f"{self.get_path('yizhi')}", 'rb'))}
+        files = {'file': ('yizhi.xlsx', open(f"{self.get_excel_file_path('yizhi')}", 'rb'))}
         resp = requests.post(url, files=files, headers={"authorization": self.token}).json()
         if resp['code'] == 0:
             self.importNum = resp.get('data', '')['importNum']
