@@ -43,7 +43,7 @@ class PushStudentOrder:
             try:
                 choice = int(input("请输入：(1)表达  (2)益智  (3)魔力耳朵  (4)魔力剑桥-->"))
                 if 1 <= choice <= 4:
-                    return [["表达", "益智", "魔力耳朵", "魔力剑桥"][choice - 1]]
+                    return ["表达", "益智", "魔力耳朵", "魔力剑桥"][choice - 1]
                 else:
                     print("请输入一个数字1~5获取正确的学科")
             except ValueError:
