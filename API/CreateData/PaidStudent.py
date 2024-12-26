@@ -24,7 +24,7 @@ class PushStudentOrder:
         :param num: 需要上传的学员订单条数
         :param custom_number: 自定义的手机号
         '''
-        self.subject = self.subject()
+        self.subject = self.subject_name()
         self.environment = self.input_environment()
         self.custom_number = self.custom_phone_number()
         if self.custom_number == "0":
@@ -38,12 +38,14 @@ class PushStudentOrder:
         b_pwd = base64.b64encode(passwd.encode()).decode('utf-8')
         return b_pwd
 
-    def subject(self):
+    def subject_name(self) -> list:
         while True:
             try:
-                choice = int(input("请输入：(1)表达  (2)益智  (3)魔力耳朵  (4)魔力剑桥-->"))
-                if 1 <= choice <= 4:
-                    return ["表达", "益智", "魔力耳朵", "魔力剑桥"][choice - 1]
+                choice = int(input("请输入：(1)表达 (2)益智 (3)魔力耳朵 (4)魔力剑桥 (5)所有学科-->"))
+                if 1 <= choice <= 5:
+                    if choice == 5:  # 处理“所有学科”选项
+                        return ["表达", "益智", "魔力耳朵", "魔力剑桥"]
+                    return [["表达", "益智", "魔力耳朵", "魔力剑桥"][choice - 1]]
                 else:
                     print("请输入一个数字1~5获取正确的学科")
             except ValueError:
@@ -477,23 +479,20 @@ class PushStudentOrder:
 
     # 最后执行的总函数
     def main(self):
-        if self.subject in ("表达", "魔力耳朵", "魔力剑桥"):
-            try:
-                self.import_order()
-                self.last_auditing_order()
-                self.get_student_account()
-                time.sleep(600)
-            except Exception as e:
-                print(f"异常：{e}")
-                time.sleep(200)
-        elif self.subject == "益智":
-            try:
-                self.yizhi_last_audit()
-                self.get_student_account()
-                time.sleep(600)
-            except Exception as e:
-                print(f"异常：{e}")
-                time.sleep(200)
+        for self.subject in self.subject:
+            if self.subject in ("表达", "魔力耳朵", "魔力剑桥"):
+                try:
+                    self.import_order()
+                    self.last_auditing_order()
+                    self.get_student_account()
+                except Exception as e:
+                    print(f"异常：{e}")
+            elif self.subject == "益智":
+                try:
+                    self.yizhi_last_audit()
+                    self.get_student_account()
+                except Exception as e:
+                    print(f"异常：{e}")
 
 
 if __name__ == '__main__':

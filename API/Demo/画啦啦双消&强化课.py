@@ -171,7 +171,7 @@ def future_date(num_day):
 
 
 # 获取15.20-16.30分的批次详情id，用于开放时段
-def get_batch_detailId(batch_id, host, token, time_id):
+def get_batch_detailId(token,batch_id, host = "https://gw-mg-preprod.61info.cn", time_id = 96):
     url = f"{host}/manager-api/o/new/applyAllocate/getBatchDetail.json"
     headers = {"authorization": token, 'content-type': 'application/x-www-form-urlencoded;charset=UTF-8'}
     payload = f'batchId={batch_id}&needRecommendGroupCount=0'
@@ -235,5 +235,5 @@ def future_num_date(num_day):
     return str(future_date)
 
 if __name__ == '__main__':
-    print(today_date())
-    print(future_num_date(10))
+    print(get_batch_detailId(
+        "eyJhbGciOiJIUzI1NiJ9.eyJkYXRhIjoicGgzMk4wK0diSThPZEhNMnZpbUJ5WDlKM2N2RXIxbFl0YVhZdmVxd1dENXV4bzJ0bCt2d0NkalJDTlBLR2lueG1yT2NiZlJuVys1eCttRnF3eTdBVFlIMEdWb0lEdk4vZGxLL3o1NXdvS0hJVFZJNHEwTUF4SEpLWkNISW1lUTNiY1dtUk9VSjlrMzZNOGpaVWV6SlFrMHhRT0d6OE5aNmFwTnpuYys4LzZBVGVoc2lXUVMybmlKVWVYWThNMDhMSDU5aXA2UWNjMVM4SUxNY2VDK2YzUnRGSjNsKzZ5eHNIVm9vY2pkNWNpeGloUkZBK0RVdEhnM0dWZDJrM2M3bXFBZ1h5Wld5TG4rUHRoZ0dYT1ZsaUJlRXp4Y1FQRDhFV1pWT2lZcTFHOW89IiwiZXhwIjoxNzUwNjcwNjk1fQ.P1NxhuTIOQPF7VpYE6H0cy5B_qnI_hJI49adxabLDYY",598))

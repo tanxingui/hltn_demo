@@ -24,7 +24,7 @@ class PushStudentOrder:
         :param num: 需要上传的学员订单条数
         :param custom_number: 自定义的手机号
         '''
-        InputMethods().subject = InputMethods().subject()
+        InputMethods().subject_name = InputMethods().subject_name()
         InputMethods().input_environment = self.input_environment()
         self.num = self.input_num()
         self.custom_number = self.custom_phone_number()
@@ -182,7 +182,7 @@ class PushStudentOrder:
         data_list = GetStudentPhone().get_student_phone()
         formatted_datetime1 = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
         formatted_datetime2 = datetime.now().strftime("%Y%m%d%H%M%S")
-        if InputMethods().subject == "口才":
+        if InputMethods().subject_name == "口才":
             file_path = GeneralMethods().get_path('test')
             workbook = openpyxl.load_workbook(file_path)
             sheet = workbook["Sheet1"]
@@ -219,7 +219,7 @@ class PushStudentOrder:
                     sheet.cell(row=3 + index, column=5, value=value)  # 手机号
             workbook.save(file_path)
             workbook.close()
-        elif InputMethods().subject == "益智":
+        elif InputMethods().subject_name == "益智":
             file_path = GeneralMethods().get_path('yizhi')
             workbook = openpyxl.load_workbook(file_path)
             sheet = workbook["导入主表"]
@@ -442,7 +442,7 @@ class PushStudentOrder:
 
     # 最后执行的总函数
     def main(self):
-        if InputMethods().subject == "口才":
+        if InputMethods().subject_name == "口才":
             try:
                 self.import_order()
                 self.last_auditing_order()
@@ -451,7 +451,7 @@ class PushStudentOrder:
             except Exception as e:
                 print(f"异常：{e}")
                 time.sleep(2000)
-        elif InputMethods().subject == "益智":
+        elif InputMethods().subject_name == "益智":
             try:
                 self.yizhi_last_audit()
                 self.get_student_account()
