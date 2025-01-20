@@ -43,7 +43,7 @@ class PushStudentOrder:
             try:
                 choice = int(input("请输入：(1)表达 (2)益智 (3)魔力耳朵 (4)魔力剑桥 (5)所有学科-->"))
                 if 1 <= choice <= 5:
-                    if choice == 5:  # 处理“所有学科”选项
+                    if choice == 5:
                         return ["表达", "益智", "魔力耳朵", "魔力剑桥"]
                     return [["表达", "益智", "魔力耳朵", "魔力剑桥"][choice - 1]]
                 else:
@@ -221,10 +221,10 @@ class PushStudentOrder:
                 # "mmears_order_amount": '0.01',
                 # "jianqiao_package_skuId": '31832305',
                 # "jianqiao_order_amount": '12.67',
-                "jianqiao_package_skuId": '31831672',
-                "jianqiao_order_amount": '0.01',
-                "yz_package_skuId": '10025804',
-                "yz_order_amount": '2.3'
+                "jianqiao_package_skuId": '31832305',
+                "jianqiao_order_amount": '12.67',
+                "yz_package_skuId": '10025786',
+                "yz_order_amount": '0.04'
             },
             "preprod": {
                 "kc_package_skuId": '20528464',
@@ -445,7 +445,7 @@ class PushStudentOrder:
     def yizhi_order_id(self) -> list:
         self.yizhi_next_step()
         url = f"https://{self.environment}-order.vipthink.cn/order/v1/order/importDetailList"
-        data = {"status": 1, "page": 1, "limit": 100, "importNum": f"{self.importNum}"}
+        data = {"status": 1, "page": 1, "limit": 20, "importNum": f"{self.importNum}"}
         resp = self.handle_api_response(requests.post(url, json=data, headers={"authorization": self.token}))
         if resp['code'] == 0:
             id_list = [i['id'] for i in resp['data']['data']]
@@ -488,11 +488,11 @@ class PushStudentOrder:
                 except Exception as e:
                     print(f"异常：{e}")
             elif self.subject == "益智":
-                try:
+                # try:
                     self.yizhi_last_audit()
                     self.get_student_account()
-                except Exception as e:
-                    print(f"异常：{e}")
+                # except Exception as e:
+                #     print(f"异常：{e}")
 
 
 if __name__ == '__main__':

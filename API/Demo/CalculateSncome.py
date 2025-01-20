@@ -102,8 +102,8 @@ class WorkdayCalculator:
                         end='')
                     time.sleep(1)
                 else:
-                    print(f"\n已经下班了,今日工时：{work_hours:.2f}~  今日牛马费:{self.calculate_daily_wage():.2f}元")
-                    break
+                    print(f"\r开始加班, 今日工时：{work_hours:.2f}~  今日牛马费:{self.calculate_daily_wage():.2f}元",end='')
+                    time.sleep(1)
         print("已退出程序")
 
 

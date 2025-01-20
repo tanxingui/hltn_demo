@@ -64,7 +64,7 @@ def delete_enhance_batch():
             print("未找到匹配的批次")
             return 4
     except Exception as e:
-        return f"查询出错：{str(e)}"
+        return f"查询出错 {str(e)}"
     finally:
         cursor.close()
         mysql_conn_preprod_manager.close()
@@ -73,8 +73,8 @@ def delete_enhance_batch():
 
 # 获取level的学员id，可用于提交升阶组班意向的
 def get_level_one_student(sort):
-    cursor1 = mysql_conn_test_manager.cursor()
-    cursor2 = mysql_conn_test_i61.cursor()
+    cursor1 = mysql_conn_preprod_manager.cursor()
+    cursor2 = mysql_conn_preprod_i61.cursor()
 
     try:
         sql1 = """
@@ -91,8 +91,8 @@ def get_level_one_student(sort):
             AND gtr.state = 0
             AND (aaa.state = 1 OR aaa.id IS NULL)
             AND aa.state = 7
-            ORDER BY ugr.user_id DESC
-            LIMIT 10;
+            ORDER BY RAND() DESC
+            LIMIT 30;
         """
 
         cursor1.execute(sql1)
@@ -235,5 +235,4 @@ def future_num_date(num_day):
     return str(future_date)
 
 if __name__ == '__main__':
-    print(get_batch_detailId(
-        "eyJhbGciOiJIUzI1NiJ9.eyJkYXRhIjoicGgzMk4wK0diSThPZEhNMnZpbUJ5WDlKM2N2RXIxbFl0YVhZdmVxd1dENXV4bzJ0bCt2d0NkalJDTlBLR2lueG1yT2NiZlJuVys1eCttRnF3eTdBVFlIMEdWb0lEdk4vZGxLL3o1NXdvS0hJVFZJNHEwTUF4SEpLWkNISW1lUTNiY1dtUk9VSjlrMzZNOGpaVWV6SlFrMHhRT0d6OE5aNmFwTnpuYys4LzZBVGVoc2lXUVMybmlKVWVYWThNMDhMSDU5aXA2UWNjMVM4SUxNY2VDK2YzUnRGSjNsKzZ5eHNIVm9vY2pkNWNpeGloUkZBK0RVdEhnM0dWZDJrM2M3bXFBZ1h5Wld5TG4rUHRoZ0dYT1ZsaUJlRXp4Y1FQRDhFV1pWT2lZcTFHOW89IiwiZXhwIjoxNzUwNjcwNjk1fQ.P1NxhuTIOQPF7VpYE6H0cy5B_qnI_hJI49adxabLDYY",598))
+    print(get_level_one_student(3))
