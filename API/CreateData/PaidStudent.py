@@ -229,8 +229,8 @@ class PushStudentOrder:
             "preprod": {
                 "kc_package_skuId": '20528464',
                 "kc_order_amount": '0.01',
-                "yz_package_skuId": '10016745',
-                "yz_order_amount": '1',
+                "yz_package_skuId": '10016649',
+                "yz_order_amount": '0.01',
                 "jianqiao_package_skuId": '20532903',
                 "jianqiao_order_amount": '9.99'
             }

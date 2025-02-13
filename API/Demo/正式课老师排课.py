@@ -1,114 +1,99 @@
-# #!/usr/bin/env python
-# # -*- coding: utf-8 -*-
-# """
-# # @Time   : 2025/01/06 16:24
-# # @Author : 新贵大人
-# 描述:
-# """
-# import base64
-# import requests
-#
-#
-# def uat_login(username=19191919191, passw='a@123456789'):
-#     url = 'https://uat-auth-new.vipthink.cn/iam-sso/v2/auth/admin/token'
-#     data = {
-#         "account": username,
-#         "password": base64.b64encode(passw.encode()).decode('utf-8'),
-#         "loginType": "acc_pwd"
-#     }
-#     reps = requests.post(url, json=data)
-#     return reps.json()['data']['token']
-#
-# def reset_teacher_time(teacherId,calId,duration,catSids):
-#     # 120分钟方案
-#     # time_strings = ["08:00", "10:10", "12:20", "14:30", "16:40", "18:50", "21:00", "23:10"]
-#     # uat专用方案
-#     time_strings = ["01:00", "02:00", "03:00", "04:00", "05:00", "06:00", "07:00", "08:00", "09:00", "10:00", "11:00",
-#              "12:00", "13:00", "14:00", "15:00", "16:00", "16:50", "17:40", "18:30", "19:20", "2010", "21:00",
-#              "22:00", "22:50", "23:40"]
-#
-#     for time_str in time_strings:
-#         hour, minute = map(int, time_str.split(':'))
-#         for i in range(7):
-#             url = 'https://uat-tqs.vipthink.cn/api/edu_teach/resetTeacherTime'
-#             data = {"teacherId": teacherId, "calId": calId, "timeBean": {"week": i+1, "hour": hour, "minute": minute, "duration": duration, "catSids": catSids}}
-#             headers = {"authorization": f"{uat_login()}"}
-#             reps = requests.post(url, headers=headers, json=data)
-#             print(reps.json())
-#
-#
-# if __name__ == '__main__':
-#     reset_teacher_time(1081, 27, 40, [5310])  # 圆圆老师01
+#!/usr/bin/env python
+# -*- coding: utf-8 -*-
+"""
+# @Time   : 2025/01/06 16:24
+# @Author : 新贵大人
+描述:
+"""
+
 import base64
 import requests
 from concurrent.futures import ThreadPoolExecutor
 
-def uat_login(username=19191919191, passw='a@123456789'):
-    url = 'https://uat-auth-new.vipthink.cn/iam-sso/v2/auth/admin/token'
-    data = {
-        "account": username,
-        "password": base64.b64encode(passw.encode()).decode('utf-8'),
-        "loginType": "acc_pwd"
-    }
-    reps = requests.post(url, json=data)
-    return reps.json()['data']['token']
 
-def reset_teacher_time(teacherId, calId, duration, catSids):
-    # 120分钟方案
-    # time_strings = ["08:00", "10:10", "12:20", "14:30", "16:40", "18:50", "21:00", "23:10"]
-    # uat专用方案
-    time_strings = [
-        "01:00", "02:00", "03:00", "04:00", "05:00", "06:00", "07:00", "08:00", "09:00", "10:00", "11:00",
-        "12:00", "13:00", "14:00", "15:00", "16:00", "16:50", "17:40", "18:30", "19:20", "20:10", "21:00",
-        "22:00", "22:50", "23:40"]
-
-    url = "https://uat-tqs.vipthink.cn/api/edu_teach/resetTeacherTime"
-    headers = {"authorization": uat_login()}
-
-    # 提前解析时间字符串
-    time_data = [(int(t.split(':')[0]), int(t.split(':')[1])) for t in time_strings]
-
-    # 定义请求发送函数
-    def send_request(time_tuple, week_day):
-        hour, minute = time_tuple
+class ArrangeCourse:
+    def uat_login(self, environment, username=18707699952, passw='klzz1234@@'):
+        url = f'https://{environment}-auth-new.vipthink.cn/iam-sso/v2/auth/admin/token'
         data = {
-            "teacherId": teacherId,
-            "calId": calId,
-            "timeBean": {
-                "week": week_day,
-                "hour": hour,
-                "minute": minute,
-                "duration": duration,
-                "catSids": catSids
-            }
+            "account": username,
+            "password": base64.b64encode(passw.encode()).decode('utf-8'),
+            "loginType": "acc_pwd"
         }
-        try:
-            response = requests.post(url, headers=headers, json=data, timeout=10)
-            return response.json()
-        except requests.RequestException as e:
-            return {"error": str(e)}
+        reps = requests.post(url, json=data)
+        return reps.json()['data']['token']
 
-    # 使用线程池并发发送请求
-    with ThreadPoolExecutor(max_workers=20) as executor:
-        futures = []
-        for hour, minute in time_data:
-            for week_day in range(1, 8):  # 1到8表示周一到周日
-                futures.append(executor.submit(send_request, (hour, minute), week_day))
+    def reset_teacher_time(self, teacherId, calId, hours, catSids, environment):
+        # 测试环境：120分钟方案
+        # time_strings = ["08:00", "10:10", "12:20", "14:30", "16:40", "18:50", "21:00", "23:10"]
+        # uat专用方案
+        global time_data
+        uat_time_strings = [
+            "01:00", "02:00", "03:00", "04:00", "05:00", "06:00", "07:00", "08:00", "09:00", "10:00", "11:00",
+            "12:00", "13:00", "14:00", "15:00", "16:00", "16:50", "17:40", "18:30", "19:20", "20:10", "21:00",
+            "22:00", "22:50", "23:40"]
 
-        # 收集并打印结果
-        for future in futures:
-            result = future.result()
-            if "error" in result:
-                print(f"Error: {result['error']}")
-            else:
-                print("排课完成")
+        preprod_time_strings = [
+            "00:00", "01:00", "06:00", "07:00", "08:00", "09:00","10:00", "11:00", "12:00", "13:00", "14:00", "15:00",
+            "16:00", "16:50", "17:40", "18:30", "19:20", "20:10","21:00", "22:00", "23:00"]
 
-# 示例调用
+        url = f"https://{environment}-tqs.vipthink.cn/api/edu_teach/resetTeacherTime"
+        headers = {"authorization": self.uat_login(environment)}
+
+        if environment == "test":
+            time_data = [(int(t.split(':')[0]), int(t.split(':')[1])) for t in uat_time_strings]
+        elif environment == "preprod":
+            time_data = [(int(t.split(':')[0]), int(t.split(':')[1])) for t in preprod_time_strings]
+
+        def send_request(time_tuple, week_day):
+            hour, minute = time_tuple
+            data = {
+                "teacherId": teacherId,
+                "calId": calId,
+                "timeBean": {
+                    "week": week_day,
+                    "hour": hour,
+                    "minute": minute,
+                    "hours": hours,
+                    "catSids": catSids
+                }
+            }
+            try:
+                response = requests.post(url, headers=headers, json=data, timeout=10)
+                return response.json()
+            except requests.RequestException as e:
+                return {"error": str(e)}
+
+        # 线程池并发发送请求
+        with ThreadPoolExecutor(max_workers=20) as executor:
+            rsps = []
+            for hour, minute in time_data:
+                for week_day in range(1, 8):
+                    rsps.append(executor.submit(send_request, (hour, minute), week_day))
+
+            for rsp in rsps:
+                result = rsp.result()
+                if "error" in result:
+                    print(f"Error: {result['error']}")
+                else:
+                    print("排班结束")
+
+
 if __name__ == "__main__":
-    # 圆圆老师01 id：1081    关关老师：487
-    reset_teacher_time(
-        teacherId="1081",
-        calId="27",
-        duration=40,
-        catSids=[5310]
+    arrange_course = ArrangeCourse()
+    # arrange_course.reset_teacher_time(
+    #     #测试环境老师：圆圆老师01：1081  小桥老师：900   瑶瑶老师：148   关关老师：487  白菜老师：596  叶梅：220
+    #     teacherId="220",
+    #     calId="27",
+    #     hours=40,
+    #     catSids=[5310],
+    #     environment='test'
+    # )
+
+    arrange_course.reset_teacher_time(
+        #预发布环境  羊羊老师：47
+        teacherId="47",
+        calId="4",
+        hours=40,
+        catSids=[1191],
+        environment='preprod'
     )
