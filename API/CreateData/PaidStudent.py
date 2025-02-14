@@ -7,6 +7,7 @@
 """
 import base64
 import json
+import logging
 import os
 import re
 import time
@@ -429,11 +430,14 @@ class PushStudentOrder:
         url = f'https://{self.environment}-order.vipthink.cn/order/v1/order/import'
         files = {'file': ('yizhi.xlsx', open(f"{self.get_excel_file_path('yizhi')}", 'rb'))}
         resp = requests.post(url, files=files, headers={"authorization": self.token}).json()
-        if resp['code'] == 0:
-            self.importNum = resp.get('data', '')['importNum']
-            return resp.get('data', '')['importNum']
-        else:
-            print(f"导入失败，{resp['message']}")
+        try:
+            if resp.get('code') == 0:
+                self.importNum = resp.get('data', '')['importNum']
+                return resp.get('data', '')['importNum']
+            else:
+                print(f"导入失败，{resp['message']}")
+        except (KeyError, TypeError) as e:
+            logging.error(f"解析响应数据失败: {e}")
 
     # 益智订单导入后下一步：进入待审核
     def yizhi_next_step(self):
