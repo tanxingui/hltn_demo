@@ -211,7 +211,7 @@ class PushStudentOrder:
         '''
         data_list = self.get_student_phone()
         formatted_datetime1 = (datetime.now()-timedelta(days=1)).strftime("%Y-%m-%d %H:%M:%S")
-        formatted_datetime2 = datetime.now().strftime("%Y%m%d%H%M%S")
+        formatted_datetime2 = (datetime.now()-timedelta(days=1)).strftime("%Y%m%d%H%M%S")
         environment_settings = {
             "uat": {
                 "kc_package_skuId": '31825515',
