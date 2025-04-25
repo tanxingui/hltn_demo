@@ -210,14 +210,14 @@ class PushStudentOrder:
         :return:
         '''
         data_list = self.get_student_phone()
-        formatted_datetime1 = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+        formatted_datetime1 = (datetime.now()-timedelta(days=1)).strftime("%Y-%m-%d %H:%M:%S")
         formatted_datetime2 = datetime.now().strftime("%Y%m%d%H%M%S")
         environment_settings = {
             "uat": {
                 "kc_package_skuId": '31825515',
                 "kc_order_amount": '0.02',
-                "mmears_package_skuId": '31831916',
-                "mmears_order_amount": '10',
+                "mmears_package_skuId": '31830439',
+                "mmears_order_amount": '0.43',
                 # "mmears_package_skuId": '31828566',
                 # "mmears_order_amount": '0.01',
                 # "jianqiao_package_skuId": '31832305',
@@ -228,9 +228,9 @@ class PushStudentOrder:
                 "yz_order_amount": '0.04'
             },
             "preprod": {
-                "kc_package_skuId": '20528464',
+                "kc_package_skuId": '20529443',
                 "kc_order_amount": '0.01',
-                "yz_package_skuId": '10016649',
+                "yz_package_skuId": '10016570',
                 "yz_order_amount": '0.01',
                 "jianqiao_package_skuId": '20532903',
                 "jianqiao_order_amount": '9.99'

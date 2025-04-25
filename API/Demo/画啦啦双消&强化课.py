@@ -235,4 +235,4 @@ def future_num_date(num_day):
     return str(future_date)
 
 if __name__ == '__main__':
-    print(get_level_one_student(3))
+    print(get_week_day(6))
