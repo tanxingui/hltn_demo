@@ -60,7 +60,7 @@ class PushStudentOrder:
             elif custom_number == "":
                 return str(0)
             else:
-                custom_number = re.sub(r'[，，.、。\s]+', ',', custom_number)
+                custom_number = re.sub(r'[，.、。\s]+', ',', custom_number)
                 # 使用strip()去掉手机号前后的空格
                 phone_numbers = [phone for phone in custom_number.split(',') if phone.strip()]
                 # all() 函数用于判断给定的可迭代参数iterable中的所有元素是否都为 TRUE，如果是返回 True，否则返回 False
