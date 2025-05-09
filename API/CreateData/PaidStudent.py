@@ -60,10 +60,11 @@ class PushStudentOrder:
             elif custom_number == "":
                 return str(0)
             else:
-                custom_number = re.sub(r'[，，、。\s]+', ',', custom_number)
-                phone_numbers = custom_number.split(',')
+                custom_number = re.sub(r'[，，.、。\s]+', ',', custom_number)
+                # 使用strip()去掉手机号前后的空格
+                phone_numbers = [phone for phone in custom_number.split(',') if phone.strip()]
                 # all() 函数用于判断给定的可迭代参数iterable中的所有元素是否都为 TRUE，如果是返回 True，否则返回 False
-                if all(len(phone.strip()) == 11 for phone in phone_numbers):
+                if all(len(phone) == 11 and phone.isdigit() for phone in phone_numbers):
                     return phone_numbers
                 else:
                     print("请输入11位数字的手机号")
@@ -214,8 +215,8 @@ class PushStudentOrder:
         formatted_datetime2 = (datetime.now()-timedelta(days=1)).strftime("%Y%m%d%H%M%S")
         environment_settings = {
             "uat": {
-                "kc_package_skuId": '31825515',
-                "kc_order_amount": '0.02',
+                "kc_package_skuId": '31827746',
+                "kc_order_amount": '20.01',
                 "mmears_package_skuId": '31830439',
                 "mmears_order_amount": '0.43',
                 # "mmears_package_skuId": '31828566',
@@ -254,7 +255,8 @@ class PushStudentOrder:
                     sheet.cell(row=3 + index, column=4, value="86")  # 手机区号
                     sheet.cell(row=3 + index, column=10, value=formatted_datetime1)  # 支付时间
                     sheet.cell(row=3 + index, column=11, value="free")  # 支付方式
-                    sheet.cell(row=3 + index, column=12, value="481608")  # 渠道id
+                    # sheet.cell(row=3 + index, column=12, value="481608")  # 渠道id
+                    sheet.cell(row=3 + index, column=12, value="0")  # 渠道id
                     sheet.cell(row=3 + index, column=13, value="1999")  # 获得原因
                     sheet.cell(row=3 + index, column=15, value="0")  # 是否需要地址
                     sheet.cell(row=3 + index, column=1, value=f'XG{formatted_datetime2}{value}')  # 第三方订单号
