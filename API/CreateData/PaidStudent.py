@@ -42,13 +42,13 @@ class PushStudentOrder:
     def subject_name(self) -> list:
         while True:
             try:
-                choice = int(input("请输入：(1)表达 (2)益智 (3)魔力耳朵 (4)魔力剑桥 (5)所有学科-->"))
-                if 1 <= choice <= 5:
-                    if choice == 5:
-                        return ["表达", "益智", "魔力耳朵", "魔力剑桥"]
-                    return [["表达", "益智", "魔力耳朵", "魔力剑桥"][choice - 1]]
+                choice = int(input("请输入：(1)表达 (2)益智 (3)围棋 (4)数学 (5)魔力耳朵 (6)魔力剑桥 (7)所有学科-->"))
+                if 1 <= choice <= 7:
+                    if choice == 7:
+                        return ["表达", "益智", "围棋", "数学", "魔力耳朵", "魔力剑桥"]
+                    return [["表达", "益智", "围棋", "数学", "魔力耳朵", "魔力剑桥"][choice - 1]]
                 else:
-                    print("请输入一个数字1~5获取正确的学科")
+                    print("请输入一个数字1~7获取正确的学科")
             except ValueError:
                 print("输入错误，请输入数字")
 
@@ -217,27 +217,31 @@ class PushStudentOrder:
             "uat": {
                 "kc_package_skuId": '31827746',
                 "kc_order_amount": '20.01',
-                "mmears_package_skuId": '31830439',
-                "mmears_order_amount": '0.43',
-                # "mmears_package_skuId": '31828566',
-                # "mmears_order_amount": '0.01',
-                # "jianqiao_package_skuId": '31832305',
-                # "jianqiao_order_amount": '12.67',
+                "mmears_package_skuId": '31832911',
+                "mmears_order_amount": '500',
                 "jianqiao_package_skuId": '31832305',
                 "jianqiao_order_amount": '12.67',
-                "yz_package_skuId": '10025786',
-                "yz_order_amount": '0.04'
+                "weiqi_package_skuId": '31828570',
+                "weiqi_order_amount": '0.01',
+                "yz_package_skuId": '10026037',
+                "yz_order_amount": '51',
+                "math_package_skuId": '31835440',
+                "math_order_amount": '2856'
             },
             "preprod": {
                 "kc_package_skuId": '20529443',
                 "kc_order_amount": '0.01',
-                "yz_package_skuId": '10016570',
-                "yz_order_amount": '0.01',
+                "weiqi_package_skuId": '20529441',
+                "weiqi_order_amount": '0.01',
+                "yz_package_skuId": '10016747',
+                "yz_order_amount": '80',
                 "jianqiao_package_skuId": '20532903',
-                "jianqiao_order_amount": '9.99'
+                "jianqiao_order_amount": '9.99',
+                "math_package_skuId": '20536160',
+                "math_order_amount": '0.08'
             }
         }
-        if self.subject in ("表达", "魔力耳朵", "魔力剑桥"):
+        if self.subject in ("表达", "魔力耳朵", "围棋", "数学", "魔力剑桥"):
             if self.environment in environment_settings:
                 settings = environment_settings[self.environment]
                 file_path = self.get_excel_file_path('biaoda')
@@ -255,8 +259,7 @@ class PushStudentOrder:
                     sheet.cell(row=3 + index, column=4, value="86")  # 手机区号
                     sheet.cell(row=3 + index, column=10, value=formatted_datetime1)  # 支付时间
                     sheet.cell(row=3 + index, column=11, value="free")  # 支付方式
-                    # sheet.cell(row=3 + index, column=12, value="481608")  # 渠道id
-                    sheet.cell(row=3 + index, column=12, value="0")  # 渠道id
+                    sheet.cell(row=3 + index, column=12, value="0")  # 渠道id 剑桥ecc渠道：468131
                     sheet.cell(row=3 + index, column=13, value="1999")  # 获得原因
                     sheet.cell(row=3 + index, column=15, value="0")  # 是否需要地址
                     sheet.cell(row=3 + index, column=1, value=f'XG{formatted_datetime2}{value}')  # 第三方订单号
@@ -264,6 +267,12 @@ class PushStudentOrder:
                     if self.subject == "表达":
                         sheet.cell(row=3 + index, column=8, value=settings["kc_package_skuId"])  # 套餐skuid
                         sheet.cell(row=3 + index, column=9, value=settings["kc_order_amount"])  # 订单支付金额
+                    elif self.subject == "围棋":
+                        sheet.cell(row=3 + index, column=8, value=settings["weiqi_package_skuId"])  # 套餐skuid
+                        sheet.cell(row=3 + index, column=9, value=settings["weiqi_order_amount"])  # 订单支付金额
+                    elif self.subject == "数学":
+                        sheet.cell(row=3 + index, column=8, value=settings["math_package_skuId"])  # 套餐skuid
+                        sheet.cell(row=3 + index, column=9, value=settings["math_order_amount"])  # 订单支付金额
                     elif self.subject == "魔力耳朵":
                         sheet.cell(row=3 + index, column=8, value=settings["mmears_package_skuId"])  # 套餐skuid
                         sheet.cell(row=3 + index, column=9, value=settings["mmears_order_amount"])  # 订单支付金额
@@ -486,7 +495,7 @@ class PushStudentOrder:
     # 最后执行的总函数
     def main(self):
         for self.subject in self.subject:
-            if self.subject in ("表达", "魔力耳朵", "魔力剑桥"):
+            if self.subject in ("表达", "围棋", "数学", "魔力耳朵", "魔力剑桥"):
                 try:
                     self.import_order()
                     self.last_auditing_order()
