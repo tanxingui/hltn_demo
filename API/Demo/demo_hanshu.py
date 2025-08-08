@@ -120,5 +120,13 @@ def future_num_date(num_day):
     future_date = today_date() + timedelta(days=num_day)
     return future_date
 
+
+
+
+def next_weekday(weekday: int):
+    today = today_date()
+    days_ahead = (weekday - 1 - today.weekday()) % 7
+    return today + timedelta(days=days_ahead)
+
 if __name__ == '__main__':
-    print(future_num_date(10))
+    print(next_weekday(5))

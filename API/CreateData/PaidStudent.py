@@ -64,10 +64,11 @@ class PushStudentOrder:
                 # 使用strip()去掉手机号前后的空格
                 phone_numbers = [phone for phone in custom_number.split(',') if phone.strip()]
                 # all() 函数用于判断给定的可迭代参数iterable中的所有元素是否都为 TRUE，如果是返回 True，否则返回 False
-                if all(len(phone) == 11 and phone.isdigit() for phone in phone_numbers):
-                    return phone_numbers
-                else:
-                    print("请输入11位数字的手机号")
+                # if all(len(phone) == 11 and phone.isdigit() for phone in phone_numbers):
+                #     return phone_numbers
+                # else:
+                    # print("请输入11位数字的手机号")
+                return phone_numbers
 
     def input_environment(self):
         if self.subject == "魔力耳朵":
@@ -215,8 +216,12 @@ class PushStudentOrder:
         formatted_datetime2 = (datetime.now()-timedelta(days=1)).strftime("%Y%m%d%H%M%S")
         environment_settings = {
             "uat": {
+                # 新签
                 "kc_package_skuId": '31827746',
                 "kc_order_amount": '20.01',
+                # 续费
+                # "kc_package_skuId": '31828101',
+                # "kc_order_amount": '10',
                 "mmears_package_skuId": '31832911',
                 "mmears_order_amount": '500',
                 "jianqiao_package_skuId": '31832305',
@@ -225,8 +230,8 @@ class PushStudentOrder:
                 "weiqi_order_amount": '0.01',
                 "yz_package_skuId": '10026037',
                 "yz_order_amount": '51',
-                "math_package_skuId": '31835440',
-                "math_order_amount": '2856'
+                "math_package_skuId": '31835572',
+                "math_order_amount": '0.02'
             },
             "preprod": {
                 "kc_package_skuId": '20529443',
@@ -237,8 +242,8 @@ class PushStudentOrder:
                 "yz_order_amount": '80',
                 "jianqiao_package_skuId": '20532903',
                 "jianqiao_order_amount": '9.99',
-                "math_package_skuId": '20536160',
-                "math_order_amount": '0.08'
+                "math_package_skuId": '20536367',
+                "math_order_amount": '0.02'
             }
         }
         if self.subject in ("表达", "魔力耳朵", "围棋", "数学", "魔力剑桥"):
@@ -263,6 +268,7 @@ class PushStudentOrder:
                     sheet.cell(row=3 + index, column=13, value="1999")  # 获得原因
                     sheet.cell(row=3 + index, column=15, value="0")  # 是否需要地址
                     sheet.cell(row=3 + index, column=1, value=f'XG{formatted_datetime2}{value}')  # 第三方订单号
+                    # sheet.cell(row=3 + index, column=1, value='AI20250629160224102c1sy')  # 第三方订单号
                     sheet.cell(row=3 + index, column=5, value=value)  # 手机号
                     if self.subject == "表达":
                         sheet.cell(row=3 + index, column=8, value=settings["kc_package_skuId"])  # 套餐skuid

@@ -12,8 +12,8 @@ else:
             break
 
 
-for i in range(1, 10):
-    strs = ""
-    for j in range(1, i + 1):
-        strs += f"{i}*{j}={i * j} "
-    print(strs)
+# for i in range(1, 10):
+#     strs = ""
+#     for j in range(1, i + 1):
+#         strs += f"{i}*{j}={i * j} "
+#     print(strs)

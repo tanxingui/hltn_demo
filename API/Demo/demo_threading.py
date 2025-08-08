@@ -9,7 +9,6 @@ class shared(object):
         self.lock = threading.Lock()
         self.incr = x
 
-        # Increment function for the thread
 
     def incrementcounter(self):
         print("等待开锁")

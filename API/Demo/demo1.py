@@ -62,3 +62,6 @@ def get_course_time():
 
 
 print(get_course_time())
+
+if __name__ == '__main__':
+    print(future_date(7))

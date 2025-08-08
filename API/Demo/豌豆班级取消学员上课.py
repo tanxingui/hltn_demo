@@ -68,5 +68,5 @@ def cancel_live(lesson_id, Authorization):
         print(f"取消直播操作失败：{e}")
         return f"请求失败：{e}"
 if __name__ == '__main__':
-    print(cancel_live('9381134',
-                'Bearer eyJhbGciOiJzaGEyNTYiLCJ0eXAiOiJKV1QifQ.W3sibmJmIjoxNzQxNjY0MTgxLCJpc3MiOiJkb2YiLCJ0emEiOiJDU1QiLCJleHAiOjE3NDE3NTA1ODEsImlhdCI6MTc0MTY2NDE4MSwic2lkIjoxfSx7InJhbmQiOiI4NDYyNzY3NjAzMzE4NzM3NDExMTg3NDM4MjUxMDc1NDcwMDAyNjczNTE0MTQ3MDQxMzQ0MTA5NzIyMTg3MjQ1IiwidWlkIjo1MTM0NywidHlwIjoiYSIsInRpbWUiOjE3NDE2NjQxODF9XQ.OWJiMTI5MzJkZjRhMjJjMDgyZWM2ZGQ0MTViNWVmYmM0YWMyOGNjYWU5YTY5NzdhMWM5NjU4ZjNmODJmYWNjOA'))
+    print(cancel_live('9403626',
+                'Bearer eyJhbGciOiJzaGEyNTYiLCJ0eXAiOiJKV1QifQ.W3sibmJmIjoxNzUwNjU3MjU3LCJpc3MiOiJkb2YiLCJ0emEiOiJDU1QiLCJleHAiOjE3NTA3NDM2NTcsImlhdCI6MTc1MDY1NzI1Nywic2lkIjoxfSx7InJhbmQiOiIwMDA4Nzk4OTgxOTAwNTEyNDA4Mzg0NTE4Nzg2NDEyMjM4Njc4NTg2Mzc4NTk4MTE5NDgzNDU2MzA0ODQxMjY4IiwidWlkIjo1MTM0NywidHlwIjoiYSIsInRpbWUiOjE3NTA2NTcyNTd9XQ.YzYxNmIzZThiMTg0YjZkZmQ4MzkwMjIzZjI0ZjEwMGViMzg2OGY5ODE1YzViODc1NmI2NzM3YTRlODY3NzA4YQ'))
