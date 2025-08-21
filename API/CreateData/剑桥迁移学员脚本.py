@@ -63,8 +63,8 @@ def post_book_course(url, token, payloads):
 
 if __name__ == '__main__':
     file_path = r'C:\Users\92101\Desktop\导入结果1.xlsx'
+    startTime = "1755739189000"
     url = "https://apistaging.mmears.com/course-service/api/cambridge/course/bookCourseByCourseIdAndStartTime"
     token = "1111"
-    startTime = "1755739189000"
     payloads = get_excel_data(file_path, startTime)
     post_book_course(url, token, payloads)
