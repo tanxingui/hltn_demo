@@ -6,13 +6,14 @@
 描述:
 """
 
-
 import pandas as pd
 import requests
 import json
+from datetime import datetime
 
-def get_excel_data():
-    df = pd.read_excel(r'C:\Users\92101\Desktop\导入结果1.xlsx')
+
+def get_excel_data(file_path, startTime):
+    df = pd.read_excel(file_path)
     unique_df = df.drop_duplicates(subset=['班级id'])
     payloads = []
     for index, row in unique_df.iterrows():
@@ -31,7 +32,7 @@ def get_excel_data():
 
         payload = {
             "courseId": course_id,
-            "startTime": 1755532853000,  # 示例时间戳，根据需要调整
+            "startTime": startTime,
             "bookNum": 4,
             "level": level,
             "unit": unit,
@@ -46,16 +47,24 @@ def get_excel_data():
     return payloads
 
 
-def post():
-    url = "http://apistaging.mmears.com/course-service/api/cambridge/course/bookCourseByCourseIdAndStartTime"
+def post_book_course(url, token, payloads):
     headers = {
         "Content-Type": "application/json",
-        "X-Auth-Token": "123456"
+        "X-Auth-Token": token
     }
-    for payload in get_excel_data():
+    for payload in payloads:
         course_id = payload['courseId']
-        response = requests.post(url, headers=headers, data=json.dumps(payload))
-        print(f"班级 {course_id}: {response.status_code}, {response.json()}")
+        try:
+            response = requests.post(url, headers=headers, data=json.dumps(payload))
+            print(f"班级 {course_id}: {response.status_code}, {response.json()}")
+        except requests.exceptions.RequestException as e:
+            print(f"请求失败，班级 {course_id}: {e}")
+
 
 if __name__ == '__main__':
-    post()
+    file_path = r'C:\Users\92101\Desktop\导入结果1.xlsx'
+    url = "https://apistaging.mmears.com/course-service/api/cambridge/course/bookCourseByCourseIdAndStartTime"
+    token = "1111"
+    startTime = "1755739189000"
+    payloads = get_excel_data(file_path, startTime)
+    post_book_course(url, token, payloads)
