@@ -9,7 +9,6 @@
 import pandas as pd
 import requests
 import json
-from datetime import datetime
 
 
 def get_excel_data(file_path, startTime):
@@ -66,9 +65,9 @@ def post_book_course(url, token, payloads):
 
 
 if __name__ == '__main__':
-    file_path = r'C:\Users\92101\Desktop\第2批迁移学员-俊涛.xlsx'
-    startTime = "1755739189000"
+    file_path = r'C:\Users\92101\Desktop\第3批迁移学员-俊涛.xlsx'
+    startTime = "1756742400000"
     url = "https://apistaging.mmears.com/course-service/api/cambridge/course/bookCourseByCourseIdAndStartTime"
-    token = "1111"
+    token = "eyJhbGciOiJIUzUxMiJ9.eyJzdWIiOiIxMzI1NiIsIm5hbWUiOiLosK3mlrDotLUiLCJzdXBwb3J0SWQiOm51bGwsImV4cCI6MTc1NjUyMDQ4OCwiaWF0IjoxNzU2NDM0MDg4LCJlbWFpbCI6InRhbnhpbmd1aUBobHRuLmNvbSJ9.kkGRtqwxcz4HxbDT9jNAHOxbjcvyQf38tiSUWsiZnU2-kFrr3STZ30HykdDsakKwDoQhZ99q-ceYxLqn5yclqQ"
     payloads = get_excel_data(file_path, startTime)
     post_book_course(url, token, payloads)
