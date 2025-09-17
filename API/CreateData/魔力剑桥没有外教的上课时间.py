@@ -1,5 +1,5 @@
 import ast
-import json, re, datetime as dt
+import  re, datetime as dt
 import pandas as pd
 
 with open(r'C:\Users\92101\Desktop\没有合适外教数据.txt', encoding='utf-8') as f:
@@ -9,7 +9,6 @@ chunks = re.findall(r'班级 (\d+): 200, (\{.*?\})(?=\s*班级|\s*$)', raw_text,
 
 first_batch = []
 second_batch = []
-# second_map = {}
 
 for cls_id_str, json_str in chunks:
     cls_id = int(cls_id_str)
@@ -37,15 +36,6 @@ for cls_id_str, json_str in chunks:
         # 第二批
         second_batch.append((cls_id, all_lessons[first_cambridge_idx]['startTime']))
 
-    # # 第二批去重已经在的数据
-    # for item in all_lessons[first_cambridge_idx + 1:]:
-    #     if item['bookResult'] == '剑桥没有找到适合外教':
-    #         ts = item['startTime']
-    #         if cls_id not in second_map:
-    #             second_map[cls_id] = set()
-    #         if ts not in second_map[cls_id]:
-    #             second_map[cls_id].add(ts)
-
 WEEKDAY_MAP = {'Mon': '周一', 'Tue': '周二', 'Wed': '周三', 'Thu': '周四',  'Fri': '周五', 'Sat': '周六', 'Sun': '周日'}
 
 def ms2str(ms):
@@ -53,11 +43,11 @@ def ms2str(ms):
     weekday = WEEKDAY_MAP[dt.datetime.fromtimestamp(ms/1000).strftime('%a')]
     return f"{local_dt.strftime('%Y-%m-%d')} {weekday} {local_dt.strftime('%H:%M:%S')}"
 
-print('第一批（班级第一次出现且前面无“约课成功”）')
+print('第一批')
 for cid, ts in first_batch:
-    print(f'班级：{cid}   没约上任何课程的上课时间： {ms2str(ts)}')
+    print(f'班级：{cid}   没约上任何课程： {ms2str(ts)}')
 
-print('\n第二批（同一个班级第二次及以后出现）')
+print('\n第二批')
 second_batch = list(dict.fromkeys(second_batch))
 for cid, ts in second_batch:
-    print(f'班级：{cid}   没有约上外教的上课时间：{ms2str(ts)}')
+    print(f'班级：{cid}   班级部分课程没有外教：{ms2str(ts)}')
