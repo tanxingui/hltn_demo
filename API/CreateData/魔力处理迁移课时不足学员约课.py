@@ -7,14 +7,14 @@
 """
 import pandas as pd
 import re
-import pymysql
+from curl_cffi import requests as ccurl_requests
 import requests
 from collections import defaultdict
 
 # mysql_moli_test = pymysql.connect(host='172.23.59.64', port=3306, user='mmtest', password='Mmears2023',
 #                                        db='db_course')
 def get_csv():
-    df = pd.read_csv(r'C:\Users\92101\Desktop\mmears-prod-bj_titan-mmears-course-service_20250916_183539.csv')
+    df = pd.read_csv(r'C:\Users\92101\Desktop\课时不足学员.csv')
     results = []
     # 正则
     class_info_pattern = re.compile(r'classInfo:(\d+)')
@@ -54,36 +54,35 @@ def get_csv():
 #     cursor.close()
 #     return rows
 
+
 # 去dms查数据
 def get_dms_data(class_info, start_time):
-    payload = {
-        "instance_name": "魔力耳朵-rds-北京-prod-从库",
-        "db_name": "db_course",
-        "schema_name": "",
-        "tb_name": "",
-        "sql_content": f"""select course_id,level,unit,selected_unitmask,teacher_id
-                       from main_class_ext
-                       where class_course_id = {class_info} and start_time = {start_time}
-                       and classroom_status <> -1;""",
-        "limit_num": 100
-    }
     headers = {
         'sec-ch-ua': '"Google Chrome";v="123", "Not:A-Brand";v="8", "Chromium";v="123"',
-        'X-Token': 'd2admin-1.25.0-lang=zh-chs; d2admin-1.25.0-uuid=9571e985-cdb9-409c-a797-a72555530197; d2admin-1.25.0-token=702d81e6-b25d-402c-aa22-8560cb66ed92',
+        'X-Token': 'd2admin-1.25.0-lang=zh-chs; d2admin-1.25.0-uuid=8690c68f-f9f3-4b49-bc34-6271db65dd8e; d2admin-1.25.0-token=47f8d22f-367a-44d7-bf3e-e472133dea6b',
         'sec-ch-ua-mobile': '?0',
-        'Authorization': '702d81e6-b25d-402c-aa22-8560cb66ed92',
+        'Authorization': '47f8d22f-367a-44d7-bf3e-e472133dea6b',
         'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/123.0.0.0 Safari/537.36',
         'Content-Type': 'application/json',
-        'Accept': 'application/json, text/plain, */*',
         'Referer': 'https://ops-dms.hltn.com/',
-        'sec-ch-ua-platform': '"Windows"'
+        'sec-ch-ua-platform': '"Windows"',
     }
 
-    resp = requests.post(
-        url='https://ops-dms-backend.hltn.com/query/v1/query',
-        json=payload,
+    json_data = {
+        # 'instance_name': '魔力耳朵-rds-北京-prod-从库',
+        'instance_name':'魔力耳朵北京测试库',
+        'db_name': 'db_course',
+        'schema_name': '',
+        'tb_name': '',
+        'sql_content': f'select course_id,level,unit,selected_unitmask,teacher_id from main_class_ext where class_course_id = {class_info} and start_time = {start_time} and classroom_status <> -1 limit 100;',
+        'limit_num': 100,
+    }
+    resp = ccurl_requests.post(
+        'https://ops-dms-backend.hltn.com/query/v1/query',
         headers=headers,
-        timeout=15
+        json=json_data,
+        impersonate="chrome123",
+        timeout=30
     ).json()
 
     if resp.get("code") == 0 and resp.get("data"):
@@ -108,13 +107,18 @@ def main(url,token):
         for time in start_times:
             db_rows = get_dms_data(class_info, time)
             for row in db_rows:
-                course_id, level, unit, selected_unitmask, teacher_id = row
+                course_id = row["course_id"]
+                level=row["level"]
+                unit = row["unit"]
+                selected_unitmask = row["selected_unitmask"]
+                teacher_id = row["teacher_id"]
+                print(type(level))
                 full_course_info.append({
                     "course_id": str(course_id),
                     "course_start_time": ms2str(time),
                     "lesson": str(selected_unitmask),
                     "unit": str(unit),
-                    "level": str(level - 8000),
+                    "level": str(level - 80000),
                     "teacher_id": teacher_id
                 })
 
