@@ -34,7 +34,7 @@ for cls_id_str, json_str in chunks:
     if first_cambridge_idx == 0:
         first_batch.append((cls_id, all_lessons[first_cambridge_idx]['startTime']))
     else:
-        # 第二批只记一次
+        # 第二批
         second_batch.append((cls_id, all_lessons[first_cambridge_idx]['startTime']))
 
     # # 第二批去重已经在的数据
@@ -46,17 +46,16 @@ for cls_id_str, json_str in chunks:
     #         if ts not in second_map[cls_id]:
     #             second_map[cls_id].add(ts)
 
-def fmt(ts):
-    return dt.datetime.fromtimestamp(ts / 1000).strftime('%a %H:%M').replace('Mon', '周一').replace('Tue',
-                                                                                                    '周二').replace(
-        'Wed', '周三').replace('Thu', '周四').replace('Fri', '周五').replace('Sat', '周六').replace('Sun', '周日')
+WEEKDAY_MAP = {'Mon': '周一', 'Tue': '周二', 'Wed': '周三', 'Thu': '周四',  'Fri': '周五', 'Sat': '周六', 'Sun': '周日'}
 
 def ms2str(ms):
-    return pd.to_datetime(ms, unit='ms', utc=True).tz_convert('Asia/Shanghai').strftime('%Y-%m-%d %H:%M:%S')
+    local_dt = pd.to_datetime(ms, unit='ms', utc=True).tz_convert('Asia/Shanghai')
+    weekday = WEEKDAY_MAP[dt.datetime.fromtimestamp(ms/1000).strftime('%a')]
+    return f"{local_dt.strftime('%Y-%m-%d')} {weekday} {local_dt.strftime('%H:%M:%S')}"
 
 print('第一批（班级第一次出现且前面无“约课成功”）')
 for cid, ts in first_batch:
-    print(f'班级：{cid}   没约上任何课程的上课时间：{fmt(ts)}')
+    print(f'班级：{cid}   没约上任何课程的上课时间： {ms2str(ts)}')
 
 print('\n第二批（同一个班级第二次及以后出现）')
 second_batch = list(dict.fromkeys(second_batch))
