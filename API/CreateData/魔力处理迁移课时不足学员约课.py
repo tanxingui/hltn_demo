@@ -21,7 +21,6 @@ def get_csv():
     start_time_pattern = re.compile(r'startTime:(\d+)')
     dto_pattern = re.compile(r'StudentBookResultDTO\([^)]+\)')
 
-    # 遍历
     for _, row in df.iterrows():
         message = row['message']
         if pd.isna(message):
@@ -30,7 +29,6 @@ def get_csv():
         class_info = int(class_info_pattern.search(message).group(1))
         start_time = int(start_time_pattern.search(message).group(1))
 
-        # 提取每个DTO块
         for dto in dto_pattern.findall(message):
             if 'bookCode=10' in dto and 'bookResult=学生课时不足' in dto:
                 student_id = int(re.search(r'studentId=(\d+)', dto).group(1))

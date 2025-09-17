@@ -65,9 +65,9 @@ def post_book_course(url, token, payloads):
 
 
 if __name__ == '__main__':
-    file_path = r'C:\Users\92101\Desktop\第四导入结果.xlsx'
-    startTime = "1757952000000"
-    url = "https://apiaaa.mmears.com/course-service/api/cambridge/course/bookCourseByCourseIdAndStartTime"
-    token = "eyJhbGciOiJIUzUxMiJ9.eyJzdWIiOiIxMzI1NiIsIm5hbWUiOiLosK3mlrDotLUiLCJzdXBwb3J0SWQiOm51bGwsImV4cCI6MTc1NzcyOTAzNCwiaWF0IjoxNzU3NjQyNjM0LCJlbWFpbCI6InRhbnhpbmd1aUBobHRuLmNvbSJ9.U7Qi42M8Gy6dRQxRrLvHRaEI4jSU0E1WrjAiARXfq5l3dvNeJieO46fDhLm43Dg7osZjahiM9qSLTTb3WIXQqw"
+    file_path = r'C:\Users\92101\Desktop\第五批导入结果.xlsx'
+    startTime = "1758556800000"
+    url = "https://api.mmears.com/course-service/api/cambridge/course/bookCourseByCourseIdAndStartTime"
+    token = "eyJhbGciOiJIUzUxMiJ9.eyJzdWIiOiIxMzI1NiIsIm5hbWUiOiLosK3mlrDotLUiLCJzdXBwb3J0SWQiOm51bGwsImV4cCI6MTc1ODE3ODI1NiwiaWF0IjoxNzU4MDkxODU2LCJlbWFpbCI6InRhbnhpbmd1aUBobHRuLmNvbSJ9.GDWZ-JaFrw8m01ChjXF32--WkmYCMlvUaB_Wb3bqy0y8IVO9VPNTWwKfzIon4IOuGxwmF2po4f774b_aNnpiyQ"
     payloads = get_excel_data(file_path, startTime)
     post_book_course(url, token, payloads)
