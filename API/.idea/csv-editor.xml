@@ -3,6 +3,13 @@
   <component name="CsvFileAttributes">
     <option name="attributeMap">
       <map>
+        <entry key="C:\Users\92101\Desktop\mmears-test-bj_titan-mmears-course-service_20250918_094713.csv">
+          <value>
+            <Attribute>
+              <option name="separator" value="," />
+            </Attribute>
+          </value>
+        </entry>
         <entry key="\SelectApi\test.csv">
           <value>
             <Attribute>
