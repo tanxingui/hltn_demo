@@ -20,7 +20,7 @@ def init_token(token: str):
     TOKEN = token
 
 def get_csv():
-    df = pd.read_csv(r'C:\Users\92101\Desktop\mmears-test-bj_titan-mmears-course-service_20250918_094713.csv')
+    df = pd.read_csv(r'C:\Users\92101\Desktop\mmears-test-bj_titan-mmears-course-service_20250918_094713.csv', encoding='gbk')
     results = []
     class_info_pattern = re.compile(r'classInfo:(\d+)')
     start_time_pattern = re.compile(r'startTime:(\d+)')
