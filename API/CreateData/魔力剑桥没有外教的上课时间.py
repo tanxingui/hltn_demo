@@ -2,7 +2,7 @@ import ast
 import  re, datetime as dt
 import pandas as pd
 
-with open(r'C:\Users\92101\Desktop\没有合适外教数据.txt', encoding='utf-8') as f:
+with open(r'C:\Users\92101\Desktop\约课结果.txt', encoding='utf-8') as f:
     raw_text = f.read()
 
 chunks = re.findall(r'班级 (\d+): 200, (\{.*?\})(?=\s*班级|\s*$)', raw_text, flags=re.S)

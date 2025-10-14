@@ -515,7 +515,6 @@ class PushStudentOrder:
                 # except Exception as e:
                 #     print(f"异常：{e}")
 
-
 if __name__ == '__main__':
     RunPushStudentOrder = PushStudentOrder()
     RunPushStudentOrder.main()

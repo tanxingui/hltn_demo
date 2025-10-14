@@ -57,13 +57,11 @@ def cancel_old_student_click(Authorization):
     # 调用下一个接口
     url_cancelOldChoice = "https://gw-mg-preprod.61info.cn/manager-api/o//allocate/old/cancelOldChoice"
     for item in all_data:
-        # 构造下一个接口的请求数据
         next_data = {
             "beginCourseStageId": item['beginCourseStageId'],
             "userId": item['userId'],
             "courseTableId": item['courseTableId']
         }
-        # 发起请求
         response = requests.get(url_cancelOldChoice, params=next_data, headers={"authorization": Authorization})
         if response.json()["code"] == 0:
             print(f"取消老生学员：{item['userId']}已选分班成功")
@@ -73,4 +71,4 @@ def cancel_old_student_click(Authorization):
 
 if __name__ == '__main__':
     cancel_old_student_click(
-        'eyJhbGciOiJIUzI1NiJ9.eyJkYXRhIjoicGgzMk4wK0diSThPZEhNMnZpbUJ5WDlKM2N2RXIxbFl0YVhZdmVxd1dENXV4bzJ0bCt2d0NkalJDTlBLR2lueG1yT2NiZlJuVys1eCttRnF3eTdBVFlIMEdWb0lEdk4vZGxLL3o1NXdvS0hJVFZJNHEwTUF4SEpLWkNISW1lUTNiY1dtUk9VSjlrMzZNOGpaVWV6SlFrMHhRT0d6OE5aNmFwTnpuYys4LzZBVGVoc2lXUVMybmlKVWVYWThNMDhMSDU5aXA2UWNjMVM4SUxNY2VDK2YzUnRGSjNsKzZ5eHNIVm9vY2pkNWNpeGloUkZBK0RVdEhnM0dWZDJrM2M3bXFBZ1h5Wld5TG4rUHRoZ0dYT1ZsaUJlRXp4Y1FQRDhFV1pWT2lZcTFHOW89IiwiZXhwIjoxNzU2NjI1MDY4fQ.uUv5F3tNiDKBtQcQaVfG5eQWg7dAVUMpZ0oeD6lNET8')
+        'eyJhbGciOiJIUzI1NiJ9.eyJkYXRhIjoicGgzMk4wK0diSThPZEhNMnZpbUJ5WDlKM2N2RXIxbFl0YVhZdmVxd1dENXV4bzJ0bCt2d0NkalJDTlBLR2lueG1yT2NiZlJuVys1eCttRnF3eTdBVFlIMEdWb0lEdk4vZGxLL3o1NXdvS0hJVFZJNHEwTUF4SEpLWkNISW1lUTNiY1dtUk9VSjlrMzZNOGpaVWV6SlFrMHhRT0d6OE5aNmFwTnpuYys4LzZBVGVoc2lXUVMybmlKVWVYWThNMDhMSDU5aXA2UWNjMVM4SUxNY2VDK2YzUnRGSjNsKzZ5eHNIVm9vY2pkNWNpeGloUkZBK0RVdEhnM0dWZDJrM2M3bXFBZ1h5Wld5TG4rUHRoZ0dYT1ZsaUJlRXp4Y1FQRDhFV1pWT2lZcTFHOW89IiwiZXhwIjoxNzc1ODY5MDQwfQ.kqG7hIrW7htR_wzXu4lJ0E8J6NBOnzCWpvGAw23juCM')
