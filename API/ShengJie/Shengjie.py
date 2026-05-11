@@ -9,7 +9,7 @@
 import jsonpath
 import pandas as pd
 import requests
-from ShengJie.Mysqlconfig import DBConnection
+from Mysqlconfig import DBConnection
 import json
 import time
 

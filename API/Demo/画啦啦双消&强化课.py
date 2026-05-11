@@ -6,10 +6,12 @@
 描述:
 """
 import json
+import os
 
 import pymysql
 import datetime as dt
 import requests
+from openpyxl import load_workbook
 
 mysql_conn_preprod_manager = pymysql.connect(host='db.preprod.61draw.com', port=3306, user='root', password='dbtest',
                                              db='i61-hll-manager')
@@ -19,6 +21,34 @@ mysql_conn_test_manager = pymysql.connect(host='testdb.61info.com', port=3306, u
                                           db='i61-hll-manager')
 mysql_conn_test_i61 = pymysql.connect(host='testdb.61info.com', port=3306, user='root', password='dbtest', db='i61')
 
+def get_benefit_card_id(user_id):
+    cursor = mysql_conn_test_manager.cursor()
+    sql = f"select * from user_benefit_card_record where user_id = {user_id} and state = 0 limit 1;"
+    cursor.execute(sql)
+    results = cursor.fetchall()[0]
+    return results[0]
+
+# 更新减少权益卡文件参数
+def reduce_xg_file(apk,user_id) -> dict:
+    wb = load_workbook(apk)
+    ws = wb.active
+
+    header = next(ws.iter_rows(min_row=1, max_row=1, values_only=True))
+    try:
+        sys_code_col = header.index("系统生成编码ID") + 1   # openpyxl 列号从 1 开始
+    except ValueError:
+        raise ValueError("Excel 中未找到“系统生成编码ID”列，请检查表头")
+
+    for row in ws.iter_rows(min_row=2, values_only=False):
+        new_code = get_benefit_card_id(user_id)
+        row[sys_code_col - 1].value = new_code
+
+    wb.save(apk)
+    with open(apk, 'rb') as f:
+        file_stream = f.read()
+
+    file_name = os.path.basename(apk)
+    return {"type": 2, "file": {"name": file_name,"content": file_stream}}
 
 # 获取当前批次，如果存在则删除
 def delete_batch():
@@ -258,4 +288,6 @@ def future_num_date(num_day):
     return str(future_date)
 
 if __name__ == '__main__':
-    print(get_batch_detailId("eyJhbGciOiJIUzI1NiJ9.eyJkYXRhIjoicGgzMk4wK0diSThPZEhNMnZpbUJ5WDlKM2N2RXIxbFl0YVhZdmVxd1dENXV4bzJ0bCt2d0NkalJDTlBLR2lueG1yT2NiZlJuVys1eCttRnF3eTdBVFlIMEdWb0lEdk4vZGxLL3o1NXdvS0hJVFZJNHEwTUF4SEpLWkNISW1lUTNiY1dtUk9VSjlrMzZNOGpaVWV6SlFrMHhRT0d6OE5aNmFwTnpuYys4LzZBVGVoc2lXUVMybmlKVWVYWThNMDhMSDU5aXA2UWNjMVM4SUxNY2VDK2YzUnRGSjNsKzZ5eHNIVm9vY2pkNWNpeGloUkZBK0RVdEhnM0dWZDJrM2M3bXFBZ1h5Wld5TG4rUHRoZ0dYT1ZsaUJlRXp4Y1FQRDhFV1pWT2lZcTFHOW89IiwiZXhwIjoxNzY4MDMzNDcxfQ.UMUxzEpeh6dQIDj9C_lh-uPxQ0_uV6N0ivmILRttDqI",1216))
+    # print(get_batch_detailId("eyJhbGciOiJIUzI1NiJ9.eyJkYXRhIjoicGgzMk4wK0diSThPZEhNMnZpbUJ5WDlKM2N2RXIxbFl0YVhZdmVxd1dENXV4bzJ0bCt2d0NkalJDTlBLR2lueG1yT2NiZlJuVys1eCttRnF3eTdBVFlIMEdWb0lEdk4vZGxLL3o1NXdvS0hJVFZJNHEwTUF4SEpLWkNISW1lUTNiY1dtUk9VSjlrMzZNOGpaVWV6SlFrMHhRT0d6OE5aNmFwTnpuYys4LzZBVGVoc2lXUVMybmlKVWVYWThNMDhMSDU5aXA2UWNjMVM4SUxNY2VDK2YzUnRGSjNsKzZ5eHNIVm9vY2pkNWNpeGloUkZBK0RVdEhnM0dWZDJrM2M3bXFBZ1h5Wld5TG4rUHRoZ0dYT1ZsaUJlRXp4Y1FQRDhFV1pWT2lZcTFHOW89IiwiZXhwIjoxNzY4MDMzNDcxfQ.UMUxzEpeh6dQIDj9C_lh-uPxQ0_uV6N0ivmILRttDqI",1216))
+    # print(get_benefit_card_id(22562397))
+    print(reduce_xg_file(r"C:\Users\t\Desktop\aaa.xlsx","22562397"))

@@ -39,7 +39,7 @@ class ArrangeCourse:
         url = f"https://{environment}-tqs.vipthink.cn/api/edu_teach/resetTeacherTime"
         headers = {"authorization": self.uat_login(environment)}
 
-        if environment == "test":
+        if environment == "uat":
             time_data = [(int(t.split(':')[0]), int(t.split(':')[1])) for t in uat_time_strings]
         elif environment == "preprod":
             time_data = [(int(t.split(':')[0]), int(t.split(':')[1])) for t in preprod_time_strings]
@@ -91,9 +91,9 @@ if __name__ == "__main__":
 
     arrange_course.reset_teacher_time(
         #预发布环境  羊羊老师：47
-        teacherId="47",
-        calId="4",
+        teacherId="667508",
+        calId="27",
         hours=40,
-        catSids=[1191],
-        environment='preprod'
+        catSids=[5858],
+        environment='uat'
     )

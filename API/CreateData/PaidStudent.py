@@ -11,7 +11,9 @@ import logging
 import os
 import re
 import time
-import jsonpath
+from time import sleep
+
+from jsonpath_ng import parse
 import requests
 import openpyxl
 from datetime import datetime, timedelta
@@ -228,18 +230,20 @@ class PushStudentOrder:
                 "jianqiao_order_amount": '12.67',
                 "weiqi_package_skuId": '31828570',
                 "weiqi_order_amount": '0.01',
-                "yz_package_skuId": '10026037',
-                "yz_order_amount": '51',
-                "math_package_skuId": '31835572',
-                "math_order_amount": '0.02'
+                "yz_package_skuId": '10026122',
+                "yz_order_amount": '0.01',
+                # "math_package_skuId": '31835572',
+                # "math_order_amount": '0.02'
+                "math_package_skuId": '31837397',
+                "math_order_amount": '101.02'
             },
             "preprod": {
-                "kc_package_skuId": '20529443',
-                "kc_order_amount": '0.01',
+                "kc_package_skuId": '20535000',
+                "kc_order_amount": '500',
                 "weiqi_package_skuId": '20529441',
                 "weiqi_order_amount": '0.01',
-                "yz_package_skuId": '10016747',
-                "yz_order_amount": '80',
+                "yz_package_skuId": '10017170',
+                "yz_order_amount": '4.01',
                 "jianqiao_package_skuId": '20532903',
                 "jianqiao_order_amount": '9.99',
                 "math_package_skuId": '20536367',
@@ -362,7 +366,7 @@ class PushStudentOrder:
                 "importType": 1
             }
             resp = requests.post(url3, json=data3, headers={"authorization": self.token}).json()
-            resp_hasFail = jsonpath.jsonpath(resp, '$..hasFail')
+            resp_hasFail = parse('$..hasFail').find(resp)[0].value
             if resp_hasFail:  # hasFail 为True代表文件上传失败了
                 fail_details = resp['data']['importFailDtls']
                 for detail in fail_details:
@@ -375,27 +379,34 @@ class PushStudentOrder:
                            domain='.cos.accelerate.myqcloud.com'):
         # 修改要上传表格的数据
         self.operation_table()
+    # 获取前端签名信息
         front_sign_data = self.get_front_sign()
+    # 检查签名数据是否存在且包含有效的ossToken
         if front_sign_data and isinstance(front_sign_data['ossToken'], str):
             try:
+            # 解析前端签名数据中的JSON信息
                 dic = json.loads(front_sign_data['ossToken'])
-                secret_id = dic['credentials']['tmpSecretId']
-                secret_key = dic['credentials']['tmpSecretKey']
-                token = dic['credentials']['sessionToken']
+                secret_id = dic['credentials']['tmpSecretId']  # 临时密钥ID
+                secret_key = dic['credentials']['tmpSecretKey']  # 临时密钥
+                token = dic['credentials']['sessionToken']  # 临时会话令牌
+            # 配置COS客户端
                 config = CosConfig(Region=region, SecretId=secret_id, SecretKey=secret_key, Token=token,
                                    Domain=Bucket + domain)
                 client = CosS3Client(config)
+            # 打开要上传的Excel文件
                 with open(self.get_excel_file_path('biaoda'), 'rb') as fp:
+                # 上传文件到COS
                     response = client.put_object(
                         Bucket='test-1253622427',
                         Body=fp,
-                        Key=front_sign_data['path'],
-                        StorageClass='STANDARD',
-                        ContentType='text/html; charset=utf-8'
+                        Key=front_sign_data['path'],  # 文件在COS中的路径
+                        StorageClass='STANDARD',  # 标准存储
+                        ContentType='text/html; charset=utf-8'  # 内容类型
                     )
                     # 返回上传文件的ETag标识
                     return response['ETag']
             except Exception as e:
+            # 发生异常时返回错误信息
                 return e
 
     # 获取导入的批次号
@@ -435,9 +446,9 @@ class PushStudentOrder:
             }
             resp = self.handle_api_response(requests.post(url, json=data, headers={"authorization": self.token}))
             if resp.get('msg') == "success" and resp.get('message') == "OK":
-                print('订单号：', f"{jsonpath.jsonpath(resp, '$..orderNumber')}""审核成功")
+                print('订单号：', f"{parse('$..orderNumber').find(resp)[0].value}""审核成功")
             else:
-                print('订单号：', f"{jsonpath.jsonpath(resp, '$..orderNumber')}""审核失败")
+                print('订单号：', f"{parse('$..orderNumber').find(resp)[0].value}""审核失败")
 
     # 益智新增导单
     def yizhi_order_importNum(self):
@@ -518,3 +529,4 @@ class PushStudentOrder:
 if __name__ == '__main__':
     RunPushStudentOrder = PushStudentOrder()
     RunPushStudentOrder.main()
+
