@@ -1,17 +1,19 @@
-# class MyRange(object):
-#     def __init__(self, start, stop):
-#         self.start = start
-#         self.stop = stop
-#
-#     def __iter__(self):  # __iter__方法必须放回self
-#         return self
-#
-#     def __next__(self):  # __next__方法必须返回下一个值，当我们所有的元素都迭代完毕后，再执行next方法时就会出现StopIteration异常。
-#         if self.start >= self.stop - 1:
-#             raise StopIteration
-#         self.start += 1
-#         return self.start
-#
-#
-# for i in MyRange(0, 3):  # for语句的迭代，会忽略StopIteration异常
-#     print(i)  # 输出：0 1 2
+# 题目：编写一个程序，读取一个字符串并输出一个回文字符串。如果输入字符串已经是回文，直接输出；否则，通过在字符串末尾添加最少字符，使其成为回文。
+# 示例：输入：abca输出：abcba
+
+aaa = input("输入:")
+shun = len(aaa)
+if aaa == aaa[::-1]:
+    print(aaa)
+else:
+    for i in range(1,shun):
+        if aaa[i:] == aaa[i:][::-1]:
+            print(aaa+aaa[:i][::-1])
+            break
+
+
+# for i in range(1, 10):
+#     strs = ""
+#     for j in range(1, i + 1):
+#         strs += f"{i}*{j}={i * j} "
+#     print(strs)

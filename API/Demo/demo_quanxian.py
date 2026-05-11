@@ -1,16 +1,19 @@
 import requests
 
 
+token = "Bearer eyJhbGciOiJzaGEyNTYiLCJ0eXAiOiJKV1QifQ.W3sibmJmIjoxNzQ5NjExMTg4LCJpc3MiOiJkb2YiLCJ0emEiOiJDU1QiLCJleHAiOjE3NDk2OTc1ODgsImlhdCI6MTc0OTYxMTE4OCwic2lkIjoxfSx7InJhbmQiOiI0Mjk1NzAyMTc1OTA3NDI2ODU3MDA5MDc3Mjc5MjMxMTA3MDM0MDQ3NjgzNzQ4MTAzMzEzNjA0ODk2MDk5MzU3IiwidWlkIjo2NjcwMTYsInR5cCI6ImEiLCJ0aW1lIjoxNzQ5NjExMTg4fV0.MDJjMmJiNjUxMzQzMTgxOTUxYTNlMzMxZjUzODNhOTEwNzU4MDViOWQyYTNlZTdhOTRhYTkwNzY4M2NlMjM2Yw"
+origin = "https://uat-iam-staff-admin.vipthink.cn"
+
 def get_quanxian():
-    url = "https://uat-iam-staff-admin.vipthink.cn/iam-admin/v1/user/getDetail"
+    url = f"{origin}/iam-admin/v1/user/getDetail"
     payload = {
-        "adminId": 4968,
+        "adminId": 531,
         "unitCode": 6666
     }
     headers = {
         "content-type": "application/json",
-        "authorization": "Bearer eyJhbGciOiJzaGEyNTYiLCJ0eXAiOiJKV1QifQ.W3sibmJmIjoxNjgwNTkzMjY3LCJpc3MiOiJkb2YiLCJ0emEiOiJDU1QiLCJleHAiOjE2ODA2Nzk2NjcsImlhdCI6MTY4MDU5MzI2Nywic2lkIjoxfSx7InJhbmQiOiIyMjUyNTkxNTUwODQxNTk1ODExNjg1NzgzMTM0MTE0Mzk3MDE3NjkxNTMyMTQxMTcyNzE3NjMxMTM0MTQ2NzY3IiwidWlkIjo0OTY4LCJ0eXAiOiJhIiwidGltZSI6MTY4MDU5MzI2N31d.NDY0NmUyODJjNDNkMzI2ZTUwYjVjNjk3NTVjZGE1YjVlZDJlNjJiZWY3ZWNhZDA2OTE0OTgzNmFmZTM1MzQ0Zg",
-        "origin": "https://uat-iam-staff.vipthink.cn",
+        "authorization": token,
+        "origin": origin,
     }
 
     response = requests.request("POST", url, json=payload, headers=headers)
@@ -21,16 +24,16 @@ def get_quanxian():
 
 
 if __name__ == '__main__':
-    url1 = "https://uat-iam-staff-admin.vipthink.cn/iam-admin/v1/user/edit"
+    url1 = f"{origin}/iam-admin/v1/user/edit"
     payload1 = {
         "roleIdList": get_quanxian(),
-        "isTest": "0",
-        "adminId": 666990
+        "isTest": "1",
+        "adminId": 667508
     }
     headers1 = {
         "content-type": "application/json",
-        "authorization": "Bearer eyJhbGciOiJzaGEyNTYiLCJ0eXAiOiJKV1QifQ.W3sibmJmIjoxNjgwNTkzMjY3LCJpc3MiOiJkb2YiLCJ0emEiOiJDU1QiLCJleHAiOjE2ODA2Nzk2NjcsImlhdCI6MTY4MDU5MzI2Nywic2lkIjoxfSx7InJhbmQiOiIyMjUyNTkxNTUwODQxNTk1ODExNjg1NzgzMTM0MTE0Mzk3MDE3NjkxNTMyMTQxMTcyNzE3NjMxMTM0MTQ2NzY3IiwidWlkIjo0OTY4LCJ0eXAiOiJhIiwidGltZSI6MTY4MDU5MzI2N31d.NDY0NmUyODJjNDNkMzI2ZTUwYjVjNjk3NTVjZGE1YjVlZDJlNjJiZWY3ZWNhZDA2OTE0OTgzNmFmZTM1MzQ0Zg",
-        "origin": "https://uat-iam-staff.vipthink.cn",
+        "authorization": token,
+        "origin": origin,
     }
     response = requests.request("POST", url1, json=payload1, headers=headers1)
     print(response.text)

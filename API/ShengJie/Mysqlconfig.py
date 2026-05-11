@@ -1,8 +1,18 @@
+#!/usr/bin/env python
+# -*- coding: utf-8 -*-
+"""
+# @Time   : 2023/4/11 15:01
+# @Author : 新贵大人
+描述:
+"""
+
+import datetime as dt
+import time
 import pymysql
 
 
 class DBConnection:
-    def __init__(self, ip='testdb.61info.com', port=3306, user='root', passwd='dbtest', db="i61-hll-manage"):
+    def __init__(self, ip='testdb.61info.com', port=3306, user='root', passwd='dbtest', db="i61-hll-manager"):
         self.ip = ip
         self.port = port
         self.user = user

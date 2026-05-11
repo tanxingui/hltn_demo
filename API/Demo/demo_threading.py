@@ -9,7 +9,6 @@ class shared(object):
         self.lock = threading.Lock()
         self.incr = x
 
-        # Increment function for the thread
 
     def incrementcounter(self):
         print("等待开锁")
@@ -26,11 +25,11 @@ class shared(object):
 
 def helper_thread(c):
     # Getting a random integer between 1 to 3
-    r = random.randint(1, 3)
+    r = random.randint(1, 100)
     print("选择的随机值:", r)
     for i in range(r):
         c.incrementcounter()
-    print('已完成', str(threading.current_thread().getName()))
+    print('已完成', str(threading.current_thread()))
     print()
 
 
